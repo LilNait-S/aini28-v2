@@ -1,15 +1,14 @@
-import { LucideIcon } from "lucide-react";
+import { LucideIcon } from "lucide-react"
 
 type Menu = {
-  href: string;
-  label: string;
-  active: boolean;
-  icon?: LucideIcon;
-};
+  href: string
+  label: string
+  active: boolean
+  icon?: LucideIcon
+}
 
 export function getNavbarList({ pathname }: { pathname: string }): Menu[] {
   return [
-   
     {
       label: "Inicio",
       href: "/",
@@ -35,5 +34,5 @@ export function getNavbarList({ pathname }: { pathname: string }): Menu[] {
       href: "/nosotros",
       active: pathname.includes("/nosotros"),
     },
-  ];
+  ]
 }
