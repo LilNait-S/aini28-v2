@@ -1,5 +1,7 @@
 import { FeaturedProducts } from "@/components/home/featured-products"
 import { Hero } from "@/components/home/hero"
+import { LowPrice } from "@/components/home/low-price"
+import { RecentlyAdded } from "@/components/home/recently-added"
 import { SizesSection } from "@/components/home/sizes"
 
 export default function Home() {
@@ -8,6 +10,8 @@ export default function Home() {
       <Hero />
       <FeaturedProducts />
       <SizesSection />
+      <LowPrice />
+      <RecentlyAdded />
     </div>
   )
 }
