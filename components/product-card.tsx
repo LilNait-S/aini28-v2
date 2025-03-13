@@ -1,29 +1,30 @@
 "use client"
 
-import { Heart, ShoppingCart } from "lucide-react"
-import { Button } from "./ui/button"
-import { Product } from "@/types/product"
-import { Badge } from "./ui/badge"
-import { useState } from "react"
 import { cn } from "@/lib/utils"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./ui/tooltip"
-import { ScrollArea, ScrollBar } from "./ui/scroll-area"
+import { Product } from "@/types/product"
+import { Heart, ShoppingCart } from "lucide-react"
 import Link from "next/link"
+import { useState } from "react"
+import { Badge } from "./ui/badge"
+import { Button } from "./ui/button"
+import { ScrollArea, ScrollBar } from "./ui/scroll-area"
 
-function isLongTitle(title: string, length: number = 15): boolean {
-  return title.length > length
-}
-
-export function ProductCard({ id, sizes, title, urlImage }: Product) {
+export function ProductCard({
+  id,
+  sizes,
+  title,
+  urlImage,
+  className,
+}: Product & { className?: string }) {
   const [currentPrice, setCurrentPrice] = useState(sizes[0].price)
 
   return (
-    <article className="group/card bg-slate-50 flex flex-col space-y-2 max-w-[260px] w-full shadow-sm p-5 rounded-4xl">
+    <article
+      className={cn(
+        "group/card bg-slate-50 flex flex-col space-y-2 min-w-[260px] w-[260px] h-[460px] shadow-sm p-5 rounded-4xl",
+        className
+      )}
+    >
       <picture className="relative">
         <Link href={`/products/${id}`}>
           <img
@@ -36,24 +37,9 @@ export function ProductCard({ id, sizes, title, urlImage }: Product) {
           <Heart className="size-5 group-hover:stroke-red-600" />
         </button>
       </picture>
-      <div className="flex flex-col w-full">
+      <div className="flex flex-col w-full h-full">
         <span className="text-xl font-bold">S/.{currentPrice}</span>
-        {isLongTitle(title) ? (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <h3 className="text-lg font-semibold line-clamp-1 pr-5">
-                  {title}
-                </h3>
-              </TooltipTrigger>
-              <TooltipContent>
-                <h3>{title}</h3>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        ) : (
-          <h3 className="text-lg font-semibold line-clamp-1 pr-5">{title}</h3>
-        )}
+        <h3 className="text-lg font-semibold line-clamp-2 pr-5 text-wrap">{title}</h3>
       </div>
       <ScrollArea className="whitespace-nowrap">
         <div className="flex space-x-2 pb-3">
