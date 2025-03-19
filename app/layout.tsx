@@ -5,6 +5,7 @@ import { Navbar } from "@/components/shared/navbar"
 import { Toaster } from "@/components/ui/sonner"
 import localFont from "next/font/local"
 import { Footer } from "@/components/shared/footer"
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -36,12 +37,14 @@ export default function RootLayout({
       <body
         className={`${inter.className} ${bento.variable} ${nexus.variable} antialiased`}
       >
-        <div className="container max-w-7xl mx-auto">
-          <Navbar />
-          {children}
-        </div>
-        <Footer />
-        <Toaster richColors toastOptions={{}} closeButton />
+        <NuqsAdapter>
+          <div className="container max-w-7xl mx-auto">
+            <Navbar />
+            {children}
+          </div>
+          <Footer />
+          <Toaster richColors toastOptions={{}} closeButton />
+        </NuqsAdapter>
       </body>
     </html>
   )
