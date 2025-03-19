@@ -4,18 +4,33 @@ import { IconStar } from "@/components/icons"
 import { TypographyMuted } from "@/components/typography-muted"
 import { TypographyP } from "@/components/typography-p"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { parseAsString, useQueryState } from "nuqs"
+import { parseAsInteger, parseAsString, useQueryState } from "nuqs"
 import { PelucheBreadcrumb } from "./peluche-breadcrumb"
 import { sizes } from "@/constants/sizes"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import {
+  ChevronDown,
+  ChevronUp,
+  Heart,
+  MessageCircle,
+  Repeat,
+  ShoppingCart,
+} from "lucide-react"
+import { Separator } from "@/components/ui/separator"
 
 export default function Peluche() {
   const [size, setSize] = useQueryState(
     "size",
     parseAsString
       .withOptions({ history: "replace" })
-      .withDefault(sizes[0].id.toString())
+      .withDefault(sizes.find((s) => s.isActive)?.id.toString() ?? "1")
+  )
+
+  const [qty, setQty] = useQueryState(
+    "qty",
+    parseAsInteger.withOptions({ history: "replace" }).withDefault(1)
   )
 
   const [price, setPrice] = useState<number | undefined>(
@@ -40,7 +55,7 @@ export default function Peluche() {
             className="h-full w-full object-cover"
           />
         </picture>
-        <div className="flex flex-col space-y-2">
+        <div className="flex flex-col space-y-4">
           <div className="flex justify-between items-center">
             <span>Aini28</span>
             <span>P008</span>
@@ -86,7 +101,7 @@ export default function Peluche() {
                   <label
                     key={id}
                     className={cn(
-                      "relative flex w-full cursor-pointer flex-col items-center gap-3 rounded-lg border border-input px-2 py-3 text-center outline-offset-2 transition-colors has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-primary has-[[data-state=checked]]:text-white has-[:focus-visible]:outline has-[:focus-visible]:outline-ring/70",
+                      "relative flex w-full cursor-pointer flex-col items-center gap-3 rounded-full border border-input px-2 py-3 text-center outline-offset-2 transition-colors has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-primary has-[[data-state=checked]]:text-primary-foreground has-[:focus-visible]:outline has-[:focus-visible]:outline-ring/70",
                       !isActive && "pointer-events-none opacity-30"
                     )}
                     onClick={() => {
@@ -106,8 +121,57 @@ export default function Peluche() {
               )}
             </RadioGroup>
           </div>
+          <div className="flex space-x-2">
+            <div className="inline-flex -space-x-px rounded-full rtl:space-x-reverse">
+              <Button
+                className="rounded-none shadow-none first:rounded-s-full last:rounded-e-full focus-visible:z-10"
+                variant="secondary"
+                aria-label="Upqty"
+                disabled={qty <= 1}
+                onClick={() => setQty(qty - 1)}
+              >
+                <ChevronDown size={16} strokeWidth={2} aria-hidden="true" />
+              </Button>
+              <span className="flex items-center bg-secondary w-7 justify-center px-1 text-sm">
+                {qty}
+              </span>
+              <Button
+                className="rounded-none shadow-none first:rounded-s-full last:rounded-e-full focus-visible:z-10"
+                variant="secondary"
+                aria-label="Downqty"
+                disabled={qty >= 50}
+                onClick={() => setQty(qty + 1)}
+              >
+                <ChevronUp size={16} strokeWidth={2} aria-hidden="true" />
+              </Button>
+            </div>
+            <Button className="shrink-1 w-full">
+              <ShoppingCart />
+              Agregar al Carrito
+            </Button>
+          </div>
+          <div className="flex space-x-4">
+            <button className="flex items-center justify-center gap-1 cursor-pointer w-full">
+              <MessageCircle className="size-3.5 stroke-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Chat</span>
+            </button>
+            <Separator orientation="vertical" className="h-5" />
+            <button className="flex items-center justify-center gap-1 cursor-pointer w-full">
+              <Heart className="size-3.5 stroke-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Favoritos</span>
+            </button>
+
+            <Separator orientation="vertical" className="h-5" />
+            <button className="flex items-center justify-center gap-1 cursor-pointer w-full">
+              <Repeat className="size-3.5 stroke-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Compartir</span>
+            </button>
+          </div>
         </div>
       </main>
+      <footer className="flex flex-col items-center justify-center py-4 my-20">
+        <h3 className="text-3xl font-bold">Mas peluches bonitos para ti</h3>
+      </footer>
     </section>
   )
 }
