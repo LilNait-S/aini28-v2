@@ -26,7 +26,7 @@ export function ProductCard({
       )}
     >
       <picture className="relative">
-        <Link href={`/products/${id}`}>
+        <Link href={`/peluches/${id}`}>
           <img
             src={urlImage}
             alt={`imagen de ${title}`}
