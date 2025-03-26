@@ -1,6 +1,6 @@
 import { defineType, defineField, defineArrayMember } from "sanity"
 import { Box } from "lucide-react"
-import { size } from "./sizes" // Asegúrate de que `size` está bien definido
+import { size } from "./sizes"
 
 export const product = defineType({
   name: "product",
@@ -13,6 +13,7 @@ export const product = defineType({
       name: "code",
       title: "Código del Producto",
     }),
+
     defineField({
       type: "string",
       name: "name",
@@ -39,6 +40,13 @@ export const product = defineType({
         Rule.required()
           .min(10)
           .error("La descripción debe tener al menos 10 caracteres."),
+    }),
+    defineField({
+      type: "reference",
+      name: "category",
+      to: [{ type: "category" }],
+      validation: (Rule) =>
+        Rule.required().error("Debe seleccionar una categoría"),
     }),
     defineField({
       name: "images",
