@@ -36,3 +36,26 @@ export const sizes = [
     isActive: true,
   },
 ]
+
+export const sizes_filters = [
+  {
+    id: 1,
+    label: "Todos",
+  },
+  {
+    id: 2,
+    label: "Pequeño",
+  },
+  {
+    id: 3,
+    label: "Mediano",
+  },
+  {
+    id: 4,
+    label: "Grande",
+  },
+  {
+    id: 5,
+    label: "Gigante",
+  },
+]

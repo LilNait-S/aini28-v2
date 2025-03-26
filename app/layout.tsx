@@ -1,11 +1,9 @@
+import { Toaster } from "@/components/ui/sonner"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
-import "./globals.css"
-import { Navbar } from "@/components/shared/navbar"
-import { Toaster } from "@/components/ui/sonner"
 import localFont from "next/font/local"
-import { Footer } from "@/components/shared/footer"
-import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import { NuqsAdapter } from "nuqs/adapters/next/app"
+import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -38,11 +36,7 @@ export default function RootLayout({
         className={`${inter.className} ${bento.variable} ${nexus.variable} antialiased`}
       >
         <NuqsAdapter>
-          <div className="container max-w-7xl mx-auto">
-            <Navbar />
-            {children}
-          </div>
-          <Footer />
+          {children}
           <Toaster richColors toastOptions={{}} closeButton />
         </NuqsAdapter>
       </body>

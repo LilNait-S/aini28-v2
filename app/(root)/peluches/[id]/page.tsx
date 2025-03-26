@@ -47,7 +47,7 @@ export default function Peluche() {
       <header className="py-4">
         <PelucheBreadcrumb pelucheName="Gorila colores" />
       </header>
-      <main className="grid grid-cols-2 gap-4">
+      <main className="grid grid-cols-2 gap-12">
         <picture className="rounded-2xl overflow-hidden">
           <img
             src="/erizo-mediano.webp"
