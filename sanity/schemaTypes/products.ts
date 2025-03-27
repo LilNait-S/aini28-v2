@@ -1,6 +1,5 @@
-import { defineType, defineField, defineArrayMember } from "sanity"
 import { Box } from "lucide-react"
-import { size } from "./sizes"
+import { defineArrayMember, defineField, defineType } from "sanity"
 
 export const product = defineType({
   name: "product",
@@ -20,6 +19,7 @@ export const product = defineType({
       title: "Nombre del Producto",
       validation: (Rule) => Rule.required(),
     }),
+
     defineField({
       name: "slug",
       title: "Slug",
@@ -30,6 +30,7 @@ export const product = defineType({
       },
       validation: (Rule) => Rule.required(),
     }),
+
     defineField({
       type: "text",
       name: "description",
@@ -41,6 +42,7 @@ export const product = defineType({
           .min(10)
           .error("La descripción debe tener al menos 10 caracteres."),
     }),
+
     defineField({
       type: "reference",
       name: "category",
@@ -48,6 +50,14 @@ export const product = defineType({
       validation: (Rule) =>
         Rule.required().error("Debe seleccionar una categoría"),
     }),
+
+    defineField({
+      name: "isFeatured",
+      title: "Producto Destacado",
+      type: "boolean",
+      initialValue: false,
+    }),
+
     defineField({
       name: "images",
       title: "Imágenes del Producto",
@@ -78,6 +88,7 @@ export const product = defineType({
           .max(10)
           .error("Debe subir al menos 1 imagen y un máximo de 10."),
     }),
+
     defineField({
       name: "sizePricing",
       title: "Precios por Tamaño",
@@ -87,8 +98,35 @@ export const product = defineType({
         defineArrayMember({
           type: "object",
           title: "Precio por Tamaño",
+          preview: {
+            select: { size: "size" },
+            prepare(selection: { size?: number }) {
+              const sizeOptions: { [key: number]: string } = {
+                1: "Pequeño",
+                2: "Mediano",
+                3: "Grande",
+                4: "Gigante",
+              }
+              return {
+                title: sizeOptions[selection.size || 0] || "Desconocido",
+              }
+            },
+          },
           fields: [
-            defineField(size), // Usa el campo `size` definido
+            defineField({
+              type: "number",
+              name: "size",
+              title: "Tamaño",
+              description: "Selecciona un tamaño",
+              options: {
+                list: [
+                  { title: "Pequeño", value: 1 },
+                  { title: "Mediano", value: 2 },
+                  { title: "Grande", value: 3 },
+                  { title: "Gigante", value: 4 },
+                ],
+              },
+            }),
             defineField({
               name: "price",
               title: "Precio Base",
@@ -152,7 +190,6 @@ export const product = defineType({
   preview: {
     select: {
       title: "name",
-      media: "images.0",
     },
   },
 })

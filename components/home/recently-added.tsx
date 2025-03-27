@@ -1,10 +1,12 @@
+import { getAllProducts } from "@/lib/actions/product"
 import Link from "next/link"
-import { buttonVariants } from "../ui/button"
-import { PRODUCT } from "@/constants/products"
-import { ProductCard } from "../product-card"
 import { Fragment } from "react"
+import { ProductCard } from "../product-card"
+import { buttonVariants } from "../ui/button"
 
-export function RecentlyAdded() {
+export async function RecentlyAdded() {
+  const peluches = await getAllProducts({ limit: 6 })
+
   return (
     <section>
       <header className="flex justify-between items-center">
@@ -14,9 +16,9 @@ export function RecentlyAdded() {
         </Link>
       </header>
       <main className="grid grid-cols-4 gap-4 md:gap-6">
-        {PRODUCT.slice(0, 6).map((product, i) => {
+        {peluches.map((peluche, i) => {
           return (
-            <Fragment key={product.id}>
+            <Fragment key={peluche._id}>
               {i === 2 && (
                 <img
                   src="/picture-recently-added.webp"
@@ -24,7 +26,7 @@ export function RecentlyAdded() {
                   className="h-full w-full object-cover col-span-2 rounded-4xl"
                 />
               )}
-              <ProductCard {...product} className="w-full h-full" />
+              <ProductCard {...peluche} className="w-full h-full" />
             </Fragment>
           )
         })}

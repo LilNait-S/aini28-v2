@@ -1,22 +1,28 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { Product } from "@/types/product"
+
 import { Heart, ShoppingCart } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"
 import { ScrollArea, ScrollBar } from "./ui/scroll-area"
+import { Product } from "@/sanity/types"
+import { parseSize } from "@/utils/parse-size"
+import { urlFor } from "@/sanity/lib/image"
 
 export function ProductCard({
-  id,
-  sizes,
-  title,
-  urlImage,
+  _id,
+  name,
+  images,
+  slug,
+  sizePricing,
   className,
 }: Product & { className?: string }) {
-  const [currentPrice, setCurrentPrice] = useState(sizes[0].price)
+  const [currentPrice, setCurrentPrice] = useState<number | undefined>(
+    sizePricing?.[0]?.price
+  )
 
   return (
     <article
@@ -26,10 +32,14 @@ export function ProductCard({
       )}
     >
       <picture className="relative">
-        <Link href={`/peluches/${id}`}>
+        <Link href={`/peluches/${_id + "-" + slug?.current}`}>
           <img
-            src={urlImage}
-            alt={`imagen de ${title}`}
+            src={
+              images?.[0]
+                ? urlFor(images[0]).width(400).height(400).url()
+                : "/placeholder-image.webp"
+            }
+            alt={images?.[0]?.alt || "Imagen del producto"}
             className="rounded-3xl w-full h-full aspect-square object-cover"
           />
         </Link>
@@ -38,24 +48,28 @@ export function ProductCard({
         </button>
       </picture>
       <div className="flex flex-col w-full h-full">
-        <span className="text-xl font-bold">S/.{currentPrice}</span>
-        <h3 className="text-lg font-semibold line-clamp-2 pr-5 text-wrap">{title}</h3>
+        <span className="text-xl font-bold">S/.{currentPrice?.toFixed(2)}</span>
+        <h3 className="text-lg font-semibold line-clamp-2 pr-5 text-wrap">
+          {name}
+        </h3>
       </div>
       <ScrollArea className="whitespace-nowrap">
         <div className="flex space-x-2 pb-3">
-          {sizes.map(({ id, label, price }) => (
-            <Badge
-              key={id}
-              variant="secondary"
-              onClick={() => setCurrentPrice(price)}
-              className={cn(
-                "cursor-pointer",
-                currentPrice === price && "text-primary"
-              )}
-            >
-              {label}
-            </Badge>
-          ))}
+          {sizePricing
+            ?.filter(({ isActive }) => isActive)
+            .map(({ _key, price, size }) => (
+              <Badge
+                key={_key}
+                variant="secondary"
+                onClick={() => setCurrentPrice(price)}
+                className={cn(
+                  "cursor-pointer",
+                  currentPrice === price && "text-primary"
+                )}
+              >
+                {parseSize(size).label}
+              </Badge>
+            ))}
         </div>
         <ScrollBar orientation="horizontal" />
       </ScrollArea>

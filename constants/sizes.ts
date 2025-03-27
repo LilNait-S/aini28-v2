@@ -59,3 +59,10 @@ export const sizes_filters = [
     label: "Gigante",
   },
 ]
+
+export const sizeOptions = {
+  1: "Pequeño",
+  2: "Mediano",
+  3: "Grande",
+  4: "Gigante",
+}

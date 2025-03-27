@@ -5,7 +5,7 @@ import { LowPrice } from "@/components/home/low-price"
 import { RecentlyAdded } from "@/components/home/recently-added"
 import { SizesSection } from "@/components/home/sizes"
 
-export default function Home() {
+export default async function Home() {
   return (
     <Container>
       <div className="space-y-20 mb-20 px-3">

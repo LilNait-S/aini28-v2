@@ -1,19 +1,22 @@
-import { ChevronsRight } from "lucide-react"
-import { buttonVariants } from "../ui/button"
-import Link from "next/link"
+import { getAllProducts } from "@/lib/actions/product"
 import { cn } from "@/lib/utils"
+import { ChevronsRight } from "lucide-react"
+import Link from "next/link"
+import BudgetProductsEmptyState from "../empty/budget-products"
 import { ProductCard } from "../product-card"
-import { PRODUCT } from "@/constants/products"
+import { buttonVariants } from "../ui/button"
 
-export function LowPrice() {
+export async function LowPrice() {
+  const peluches = await getAllProducts({ minPrice: 0, maxPrice: 50, limit: 3 })
+
   return (
-    <section className="flex gap-4">
-      <picture className="relative w-fit overflow-hidden rounded-4xl">
+    <section className="flex gap-4 items-center">
+      <picture className="relative w-1/2 max-w-lg h-auto overflow-hidden rounded-4xl">
         <div className="absolute bg-gradient-to-r from-primary to-transparent h-full w-full" />
         <img
           src="/gato-low-price.webp"
           alt="imagen de peluche de gato"
-          className="h-full w-full aspect-square object-cover"
+          className="w-full h-auto object-cover"
         />
         <figcaption className="absolute top-12 left-12 text-white text-6xl font-bold max-w-96 z-20">
           Por menos de S/.50
@@ -28,11 +31,15 @@ export function LowPrice() {
           Ver mas <ChevronsRight />
         </Link>
       </picture>
-      <div className="flex space-x-4">
-        {PRODUCT.slice(0, 3).map((product) => (
-          <ProductCard key={product.id} {...product} />
-        ))}
-      </div>
+      {peluches.length > 0 ? (
+        <div className="flex space-x-4">
+          {peluches.map((product) => (
+            <ProductCard key={product._id} {...product} />
+          ))}
+        </div>
+      ) : (
+        <BudgetProductsEmptyState />
+      )}
     </section>
   )
 }
