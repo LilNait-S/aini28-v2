@@ -14,7 +14,10 @@ export async function FeaturedProducts() {
         <h2 className="text-2xl font-bold text-primary">
           Productos destacados
         </h2>
-        <Link href="#" className={buttonVariants({ variant: "link" })}>
+        <Link
+          href={`/peluches?sort=relevance`}
+          className={buttonVariants({ variant: "link" })}
+        >
           Ver más
         </Link>
       </header>

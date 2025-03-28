@@ -13,7 +13,6 @@ import { parseSize } from "@/utils/parse-size"
 import { urlFor } from "@/sanity/lib/image"
 
 export function ProductCard({
-  _id,
   name,
   images,
   slug,
@@ -32,7 +31,7 @@ export function ProductCard({
       )}
     >
       <picture className="relative">
-        <Link href={`/peluches/${_id + "-" + slug?.current}`}>
+        <Link href={`/peluches/${slug?.current}`}>
           <img
             src={
               images?.[0]

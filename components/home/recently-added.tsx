@@ -11,7 +11,7 @@ export async function RecentlyAdded() {
     <section>
       <header className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-primary">Recien agregados</h2>
-        <Link href="#" className={buttonVariants({ variant: "link" })}>
+        <Link href={`/peluches`} className={buttonVariants({ variant: "link" })}>
           Ver más
         </Link>
       </header>

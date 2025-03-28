@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "next/link"
 
 export function SizesSection() {
   return (
@@ -8,18 +8,26 @@ export function SizesSection() {
         <span className="text-primary font-bold text-3xl">Tamaños</span>
       </div>
       <div className="grid grid-cols-2 w-full gap-4">
-        <Size title="Pequeño" />
-        <Size title="Mediano" />
-        <Size title="Grande" />
-        <Size title="Gigante" />
+        <Size title="Pequeño" size={1} />
+        <Size title="Mediano" size={2} />
+        <Size title="Grande" size={3} />
+        <Size title="Gigante" size={4} />
       </div>
     </section>
   )
 }
 
-export function Size({ title, imgUrl }: { title: string; imgUrl?: string }) {
+export function Size({
+  title,
+  imgUrl,
+  size,
+}: {
+  title: string
+  imgUrl?: string
+  size: number
+}) {
   return (
-    <Link href="/peluches">
+    <Link href={`/peluches?size=${size}&page=1`}>
       <div className="flex space-x-4 bg-slate-50 rounded-4xl p-4 items-center">
         <img
           src={

@@ -77,3 +77,28 @@ export function getTotalProductsQuery() {
     ])
   `)
 }
+
+/**
+ * Genera una consulta para obtener un producto específico por su slug.
+ * @returns {string} - Consulta GROQ generada dinámicamente.
+ */
+export function getProductBySlug() {
+  return defineQuery(`
+    *[_type == "product" && slug.current == $slug][0] {
+      _id,
+      name,
+      slug,
+      _createdAt,
+      _updatedAt,
+      description,
+      isFeatured,
+      category -> { 
+        _id, 
+        title 
+      },
+      images,
+      sizePricing,
+      isActive
+    }
+  `);
+}

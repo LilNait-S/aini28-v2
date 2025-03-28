@@ -15,18 +15,18 @@ export async function LowPrice() {
 
   return (
     <section className="flex gap-4 items-center">
-      <picture className="relative w-1/2 max-w-lg h-auto overflow-hidden rounded-4xl">
+      <picture className="relative overflow-hidden rounded-4xl h-full w-full">
         <div className="absolute bg-gradient-to-r from-primary to-transparent h-full w-full" />
         <img
           src="/gato-low-price.webp"
           alt="imagen de peluche de gato"
-          className="w-full h-auto object-cover"
+          className="w-full h-full object-cover aspect-square"
         />
         <figcaption className="absolute top-12 left-12 text-white text-6xl font-bold max-w-96 z-20">
           Por menos de S/.50
         </figcaption>
         <Link
-          href={"/peluches"}
+          href={`/peluches?sort=price-asc`}
           className={cn(
             "absolute bottom-12 left-12 !pl-5 z-20",
             buttonVariants({ variant: "secondary" })

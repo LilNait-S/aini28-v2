@@ -2,7 +2,11 @@
 
 import { client } from "@/sanity/lib/client"
 import { Product } from "@/sanity/types"
-import { getProductsQuery, getTotalProductsQuery } from "../queries/product"
+import {
+  getProductBySlug,
+  getProductsQuery,
+  getTotalProductsQuery,
+} from "../queries/product"
 import { SortOption } from "@/types/models"
 
 type ProductsFilters = Partial<{
@@ -61,5 +65,15 @@ export async function getAllPeluches(
   } catch (error) {
     console.error("Error fetching products:", error)
     throw new Error("Failed to fetch products. Please try again later.")
+  }
+}
+
+export async function getPeluche({ slug }: { slug: string }) {
+  try {
+    const product: Product = await client.fetch(getProductBySlug(), { slug })
+    return product
+  } catch (error) {
+    console.error("Error fetching product:", error)
+    throw new Error("Failed to fetch product. Please try again later.")
   }
 }

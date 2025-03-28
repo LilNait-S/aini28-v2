@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/breadcrumb"
 
 interface Props {
-  pelucheName: string
+  pelucheName?: string
 }
 
 export function PelucheBreadcrumb({ pelucheName }: Props) {
