@@ -36,26 +36,56 @@ export const sizes = [
     isActive: true,
   },
 ]
+export type SortOption =
+  | null
+  | "relevance" // Por relevancia
+  | "name-asc" // A - Z
+  | "name-desc" // Z - A
+  | "price-asc" // Precio más bajo
+  | "price-desc" // Precio más alto
+
+export const sortFilter = [
+  {
+    value: "relevance",
+    label: "Relevancia",
+  },
+  {
+    value: "name-asc",
+    label: "A - Z",
+  },
+  {
+    value: "name-desc",
+    label: "Z - A",
+  },
+  {
+    value: "price-asc",
+    label: "Precio más bajo",
+  },
+  {
+    value: "price-desc",
+    label: "Precio más alto",
+  },
+]
 
 export const sizes_filters = [
   {
-    id: 1,
+    id: 0,
     label: "Todos",
   },
   {
-    id: 2,
+    id: 1,
     label: "Pequeño",
   },
   {
-    id: 3,
+    id: 2,
     label: "Mediano",
   },
   {
-    id: 4,
+    id: 3,
     label: "Grande",
   },
   {
-    id: 5,
+    id: 4,
     label: "Gigante",
   },
 ]

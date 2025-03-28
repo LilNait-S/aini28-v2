@@ -1,4 +1,4 @@
-import { getAllProducts } from "@/lib/actions/product"
+import { getAllPeluches } from "@/lib/actions/product"
 import Link from "next/link"
 import FeaturedProductsEmptyState from "../empty/featured-products"
 import { ProductCard } from "../product-card"
@@ -6,7 +6,7 @@ import { buttonVariants } from "../ui/button"
 import { ScrollArea, ScrollBar } from "../ui/scroll-area"
 
 export async function FeaturedProducts() {
-  const peluches = await getAllProducts({ isFeatured: true, limit: 10 })
+  const peluches = await getAllPeluches({ isFeatured: true, limit: 10 })
 
   return (
     <section className="flex flex-col space-y-2">

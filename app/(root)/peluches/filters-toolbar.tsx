@@ -10,15 +10,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { sizes_filters } from "@/constants/sizes"
 import { cn } from "@/lib/utils"
+import { sortFilter, sizes_filters } from "@/constants/sizes"
 import { Package, Tags } from "lucide-react"
-import { parseAsString, useQueryState } from "nuqs"
+import { parseAsInteger, parseAsString, useQueryState } from "nuqs"
 
 export function FiltersToolbar() {
   const [size, setSize] = useQueryState(
     "size",
-    parseAsString.withOptions({ history: "replace" }).withDefault("1")
+    parseAsString
+      .withOptions({ history: "replace", shallow: false })
+      .withDefault("0")
+  )
+
+  const [filters, setSetfilters] = useQueryState(
+    "sort",
+    parseAsString.withOptions({ history: "replace", shallow: false })
+  )
+
+  const [, setPage] = useQueryState(
+    "page",
+    parseAsInteger.withOptions({ history: "replace", shallow: false })
   )
 
   return (
@@ -26,18 +38,18 @@ export function FiltersToolbar() {
       <div className="flex items-center space-x-3">
         <Tags />
         <span>Ordenar</span>
-        <Select>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select a fruit" />
+        <Select value={filters ?? undefined} onValueChange={setSetfilters}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Selecciona un filtro" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
               <SelectLabel>Filtros</SelectLabel>
-              <SelectItem value="1">Relevancia</SelectItem>
-              <SelectItem value="2">A - Z</SelectItem>
-              <SelectItem value="3">Z - A</SelectItem>
-              <SelectItem value="4">Precio mas bajo</SelectItem>
-              <SelectItem value="5">Precio mas alto</SelectItem>
+              {sortFilter.map(({ value, label }) => (
+                <SelectItem key={value} value={value}>
+                  {label}
+                </SelectItem>
+              ))}
             </SelectGroup>
           </SelectContent>
         </Select>
@@ -48,7 +60,10 @@ export function FiltersToolbar() {
         <RadioGroup
           className="gap-2 flex"
           value={size ?? undefined}
-          onValueChange={(value: string) => setSize(value)}
+          onValueChange={(value: string) => {
+            setSize(value)
+            setPage(1)
+          }}
         >
           {sizes_filters.map(({ id, label }) => (
             <label

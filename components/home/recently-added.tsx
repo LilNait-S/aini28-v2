@@ -1,11 +1,11 @@
-import { getAllProducts } from "@/lib/actions/product"
+import { getAllPeluches } from "@/lib/actions/product"
 import Link from "next/link"
 import { Fragment } from "react"
 import { ProductCard } from "../product-card"
 import { buttonVariants } from "../ui/button"
 
 export async function RecentlyAdded() {
-  const peluches = await getAllProducts({ limit: 6 })
+  const peluches = await getAllPeluches({ limit: 6 })
 
   return (
     <section>

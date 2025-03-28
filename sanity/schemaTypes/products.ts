@@ -99,16 +99,18 @@ export const product = defineType({
           type: "object",
           title: "Precio por Tamaño",
           preview: {
-            select: { size: "size" },
-            prepare(selection: { size?: number }) {
+            select: { size: "size", isActive: "isActive" },
+            prepare(selection: { size?: number; isActive?: boolean }) {
               const sizeOptions: { [key: number]: string } = {
                 1: "Pequeño",
                 2: "Mediano",
                 3: "Grande",
                 4: "Gigante",
               }
+
               return {
                 title: sizeOptions[selection.size || 0] || "Desconocido",
+                subtitle: selection.isActive ? "Activo" : "Inactivo",
               }
             },
           },
@@ -148,6 +150,7 @@ export const product = defineType({
               title: "Unidad de Medida",
               type: "string",
               options: { list: ["cm", "m"], layout: "dropdown" },
+              initialValue: "cm",
               validation: (Rule) =>
                 Rule.required().error("Debe seleccionar una unidad de medida."),
             }),
@@ -162,6 +165,14 @@ export const product = defineType({
               title: "Estado Activo",
               type: "boolean",
               initialValue: true,
+            }),
+            defineField({
+              name: "stock",
+              title: "Stock",
+              type: "number",
+              description: "Cantidad de stock disponible para este tamaño",
+              validation: (Rule) =>
+                Rule.min(0).error("El stock no puede ser negativo."),
             }),
           ],
         }),

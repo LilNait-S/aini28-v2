@@ -1,4 +1,4 @@
-import { getAllProducts } from "@/lib/actions/product"
+import { getAllPeluches } from "@/lib/actions/product"
 import { cn } from "@/lib/utils"
 import { ChevronsRight } from "lucide-react"
 import Link from "next/link"
@@ -7,7 +7,7 @@ import { ProductCard } from "../product-card"
 import { buttonVariants } from "../ui/button"
 
 export async function LowPrice() {
-  const peluches = await getAllProducts({ minPrice: 0, maxPrice: 50, limit: 3 })
+  const peluches = await getAllPeluches({ minPrice: 0, maxPrice: 50, limit: 3 })
 
   return (
     <section className="flex gap-4 items-center">
