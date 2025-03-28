@@ -7,7 +7,11 @@ import { ProductCard } from "../product-card"
 import { buttonVariants } from "../ui/button"
 
 export async function LowPrice() {
-  const peluches = await getAllPeluches({ minPrice: 0, maxPrice: 50, limit: 3 })
+  const { products } = await getAllPeluches({
+    minPrice: 0,
+    maxPrice: 50,
+    pageSize: 3,
+  })
 
   return (
     <section className="flex gap-4 items-center">
@@ -31,9 +35,9 @@ export async function LowPrice() {
           Ver mas <ChevronsRight />
         </Link>
       </picture>
-      {peluches.length > 0 ? (
+      {products.length > 0 ? (
         <div className="flex space-x-4">
-          {peluches.map((product) => (
+          {products.map((product) => (
             <ProductCard key={product._id} {...product} />
           ))}
         </div>

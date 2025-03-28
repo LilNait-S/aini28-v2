@@ -6,7 +6,7 @@ import { buttonVariants } from "../ui/button"
 import { ScrollArea, ScrollBar } from "../ui/scroll-area"
 
 export async function FeaturedProducts() {
-  const peluches = await getAllPeluches({ isFeatured: true, limit: 10 })
+  const { products } = await getAllPeluches({ isFeatured: true, pageSize: 8 })
 
   return (
     <section className="flex flex-col space-y-2">
@@ -18,10 +18,10 @@ export async function FeaturedProducts() {
           Ver más
         </Link>
       </header>
-      {peluches.length > 0 ? (
+      {products.length > 0 ? (
         <ScrollArea className="whitespace-nowrap">
           <div className="flex w-max space-x-8 pb-4 pl-4">
-            {peluches.map((product) => (
+            {products.map((product) => (
               <ProductCard key={product._id} {...product} />
             ))}
           </div>

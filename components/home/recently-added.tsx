@@ -5,7 +5,7 @@ import { ProductCard } from "../product-card"
 import { buttonVariants } from "../ui/button"
 
 export async function RecentlyAdded() {
-  const peluches = await getAllPeluches({ limit: 6 })
+  const { products } = await getAllPeluches({ pageSize: 6 })
 
   return (
     <section>
@@ -16,7 +16,7 @@ export async function RecentlyAdded() {
         </Link>
       </header>
       <main className="grid grid-cols-4 gap-4 md:gap-6">
-        {peluches.map((peluche, i) => {
+        {products.map((peluche, i) => {
           return (
             <Fragment key={peluche._id}>
               {i === 2 && (
