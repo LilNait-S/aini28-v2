@@ -37,7 +37,7 @@ export default function RootLayout({
       >
         <NuqsAdapter>
           {children}
-          <Toaster richColors toastOptions={{}} closeButton />
+          <Toaster richColors toastOptions={{}} closeButton theme="light"/>
         </NuqsAdapter>
       </body>
     </html>

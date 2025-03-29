@@ -4,6 +4,7 @@ import { PelucheClient } from "./peluche-client"
 import { Params } from "@/types/params"
 import { getPeluche } from "@/lib/actions/product"
 import { PelucheImages } from "./peluche-images"
+import { LikeCounter } from "./like-counter"
 
 export default async function Peluche({ params }: Params) {
   const { slug } = await params
@@ -20,8 +21,11 @@ export default async function Peluche({ params }: Params) {
           <PelucheImages peluche={peluche} />
           <div className="flex flex-col space-y-4">
             <div className="flex justify-between items-center">
-              <span>Aini28</span>
-              <span>{code}</span>
+              <span className="text-primary">Aini28</span>
+              <div className="flex space-y-2">
+                <span>{code}</span>
+                <LikeCounter />
+              </div>
             </div>
             <h1 className="text-4xl font-bold tracking-tight">{name}</h1>
             <PelucheClient peluche={peluche} />
