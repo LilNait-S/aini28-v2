@@ -197,6 +197,15 @@ export const product = defineType({
             return true
           }),
     }),
+    defineField({
+      name: "likes",
+      title: "Likes",
+      type: "number",
+      description: "Número de likes que tiene este producto.",
+      initialValue: 0,
+      validation: (Rule) =>
+        Rule.min(0).error("El número de likes no puede ser negativo."),
+    }),
   ],
   preview: {
     select: {

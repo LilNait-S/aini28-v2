@@ -15,11 +15,8 @@ export function PelucheImages({ peluche }: PelucheImagesProps) {
     alt: images?.[0]?.alt || "Imagen del producto",
   })
 
-  console.log(images)
-
   return (
     <div className="flex flex-col items-center space-y-4">
-      {/* Imagen Principal */}
       <picture className="rounded-2xl overflow-hidden w-full">
         <img
           src={currentImage.src}
@@ -27,8 +24,6 @@ export function PelucheImages({ peluche }: PelucheImagesProps) {
           className="h-full w-full object-cover aspect-square"
         />
       </picture>
-
-      {/* Miniaturas */}
       <div className="flex space-x-2">
         {images?.map((image, index) => (
           <button

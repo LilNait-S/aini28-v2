@@ -1,6 +1,5 @@
 "use client"
 
-import { IconStar } from "@/components/icons"
 import { TypographyMuted } from "@/components/typography-muted"
 import { TypographyP } from "@/components/typography-p"
 import { Button } from "@/components/ui/button"
@@ -12,7 +11,6 @@ import { Product } from "@/sanity/types"
 import {
   ChevronDown,
   ChevronUp,
-  Heart,
   MessageCircle,
   Repeat,
   ShoppingCart,
@@ -23,7 +21,6 @@ import { useState } from "react"
 export function PelucheClient({ peluche }: { peluche: Product }) {
   const { sizePricing } = peluche
 
-  console.log("sizePricing", sizePricing)
   const [size, setSize] = useQueryState(
     "size",
     parseAsString
@@ -41,6 +38,11 @@ export function PelucheClient({ peluche }: { peluche: Product }) {
   const [price, setPrice] = useState<number | undefined>(
     sizePricing?.find((s) => s.size === Number(size))?.price
   )
+
+  const [salePrice, setSalePrice] = useState<number | undefined>(
+    sizePricing?.find((s) => s.size === Number(size))?.salePrice
+  )
+
   const [approximateSize, setApproximateSize] = useState(
     `${sizePricing?.find((s) => s.size === Number(size))?.approximateSize} ${
       sizePricing?.find((s) => s.size === Number(size))?.unit
@@ -48,22 +50,16 @@ export function PelucheClient({ peluche }: { peluche: Product }) {
   )
   return (
     <>
-      <div className="flex items-center space-x-2">
-        <div className="flex items-center space-x-1">
-          <IconStar className="size-5 fill-yellow-500" />
-          <IconStar className="size-5 fill-yellow-500" />
-          <IconStar className="size-5 fill-yellow-500" />
-          <IconStar className="size-5 fill-yellow-500" />
-          <IconStar className="size-5 fill-slate-300" />
-        </div>
-        <TypographyMuted text="42 reseñas" />
-      </div>
       <div className="flex items-start space-x-2">
-        <span className="text-5xl font-bold">S/.{price}</span>
-        <div className="flex space-x-1 items-center">
-          <span className="line-through text-muted-foreground">S/.80.00</span>
-          <p className="text-muted-foreground">Antes</p>
-        </div>
+        <span className="text-5xl font-bold">S/.{salePrice ? salePrice.toFixed(2) : price?.toFixed(2)}</span>
+        {salePrice && (
+          <div className="flex space-x-1 items-center">
+            <span className="line-through text-muted-foreground">
+              S/.{price?.toFixed(2)}
+            </span>
+            <p className="text-muted-foreground">Antes</p>
+          </div>
+        )}
       </div>
       <TypographyP text="Nuestros peluches son importados de calidad antialérgica y rellenos de napa siliconada para mantener esa esponjosidad única." />
       <div className="flex flex-col space-y-2">
@@ -79,6 +75,7 @@ export function PelucheClient({ peluche }: { peluche: Product }) {
             const price = matchingSize?.price ?? null
             const approximateSize = matchingSize?.approximateSize ?? null
             const unit = matchingSize?.unit ?? ""
+            const salePrice = sizePricing?.find((s) => s.size === staticSize)?.salePrice
 
             return (
               <label
@@ -93,6 +90,7 @@ export function PelucheClient({ peluche }: { peluche: Product }) {
                   if (isActive) {
                     setPrice(price ?? undefined)
                     setApproximateSize(`${approximateSize} ${unit}`)
+                    setSalePrice(salePrice ?? undefined)
                   }
                 }}
               >
@@ -142,13 +140,9 @@ export function PelucheClient({ peluche }: { peluche: Product }) {
           <MessageCircle className="size-3.5 stroke-muted-foreground" />
           <span className="text-sm text-muted-foreground">Chat</span>
         </button>
-        <Separator orientation="vertical" className="h-5" />
-        <button className="flex items-center justify-center gap-1 cursor-pointer w-full">
-          <Heart className="size-3.5 stroke-muted-foreground" />
-          <span className="text-sm text-muted-foreground">Favoritos</span>
-        </button>
 
         <Separator orientation="vertical" className="h-5" />
+
         <button className="flex items-center justify-center gap-1 cursor-pointer w-full">
           <Repeat className="size-3.5 stroke-muted-foreground" />
           <span className="text-sm text-muted-foreground">Compartir</span>

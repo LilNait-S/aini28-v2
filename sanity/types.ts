@@ -105,8 +105,10 @@ export type Product = {
     unit?: "cm" | "m";
     approximateSize?: number;
     isActive?: boolean;
+    stock?: number;
     _key: string;
   }>;
+  likes?: number;
 };
 
 export type SanityImageCrop = {

@@ -98,7 +98,8 @@ export function getProductBySlug() {
       },
       images,
       sizePricing,
-      isActive
+      isActive,
+      likes
     }
   `);
 }

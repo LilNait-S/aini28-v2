@@ -22,6 +22,9 @@ export function ProductCard({
   const [currentPrice, setCurrentPrice] = useState<number | undefined>(
     sizePricing?.[0]?.price
   )
+  const [currentSalePrice, setCurrentSalePrice] = useState<number | undefined>(
+    sizePricing?.[0]?.salePrice
+  )
 
   return (
     <article
@@ -47,7 +50,22 @@ export function ProductCard({
         </button>
       </picture>
       <div className="flex flex-col w-full h-full">
-        <span className="text-xl font-bold">S/.{currentPrice?.toFixed(2)}</span>
+        <div className="flex items-start space-x-2">
+          <span className="text-xl font-bold">
+            S/.
+            {currentSalePrice
+              ? currentSalePrice.toFixed(2)
+              : currentPrice?.toFixed(2)}
+          </span>
+          {currentSalePrice && (
+            <div className="flex space-x-1 items-center text-sm mt-0.5">
+              <span className="line-through text-muted-foreground">
+                S/.{currentPrice?.toFixed(2)}
+              </span>
+              <p className="text-muted-foreground">Antes</p>
+            </div>
+          )}
+        </div>
         <h3 className="text-lg font-semibold line-clamp-2 pr-5 text-wrap">
           {name}
         </h3>
@@ -56,11 +74,14 @@ export function ProductCard({
         <div className="flex space-x-2 pb-3">
           {sizePricing
             ?.filter(({ isActive }) => isActive)
-            .map(({ _key, price, size }) => (
+            .map(({ _key, price, size, salePrice }) => (
               <Badge
                 key={_key}
                 variant="secondary"
-                onClick={() => setCurrentPrice(price)}
+                onClick={() => {
+                  setCurrentPrice(price)
+                  setCurrentSalePrice(salePrice)
+                }}
                 className={cn(
                   "cursor-pointer",
                   currentPrice === price && "text-primary"

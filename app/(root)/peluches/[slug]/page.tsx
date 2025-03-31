@@ -1,15 +1,15 @@
 import { Container } from "@/components/container"
+import { getPeluche } from "@/lib/actions/product"
+import { Params } from "@/types/params"
 import { PelucheBreadcrumb } from "./peluche-breadcrumb"
 import { PelucheClient } from "./peluche-client"
-import { Params } from "@/types/params"
-import { getPeluche } from "@/lib/actions/product"
 import { PelucheImages } from "./peluche-images"
 import { LikeCounter } from "./like-counter"
 
 export default async function Peluche({ params }: Params) {
   const { slug } = await params
   const peluche = await getPeluche({ slug })
-  const { name, code } = peluche
+  const { name, code, slug: Slug, likes } = peluche
 
   return (
     <Container>
@@ -20,14 +20,12 @@ export default async function Peluche({ params }: Params) {
         <main className="grid grid-cols-2 gap-12">
           <PelucheImages peluche={peluche} />
           <div className="flex flex-col space-y-4">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mb-0">
               <span className="text-primary">Aini28</span>
-              <div className="flex space-y-2">
-                <span>{code}</span>
-                <LikeCounter />
-              </div>
+              <span>{code}</span>
             </div>
             <h1 className="text-4xl font-bold tracking-tight">{name}</h1>
+            <LikeCounter slug={Slug} initialLikes={likes} />
             <PelucheClient peluche={peluche} />
           </div>
         </main>

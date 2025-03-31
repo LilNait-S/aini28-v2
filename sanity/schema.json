@@ -585,6 +585,13 @@
                   "type": "boolean"
                 },
                 "optional": true
+              },
+              "stock": {
+                "type": "objectAttribute",
+                "value": {
+                  "type": "number"
+                },
+                "optional": true
               }
             },
             "rest": {
@@ -599,6 +606,13 @@
               }
             }
           }
+        },
+        "optional": true
+      },
+      "likes": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "number"
         },
         "optional": true
       }
