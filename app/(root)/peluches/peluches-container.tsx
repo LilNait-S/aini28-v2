@@ -7,7 +7,7 @@ interface PeluchesContainerProps {
 
 export function PeluchesContainer({ peluches }: PeluchesContainerProps) {
   return (
-    <main className="grid grid-cols-4 gap-10">
+    <main className="grid grid-cols-4 gap-5">
       {peluches.map((product) => (
         <ProductCard key={product._id} {...product} className="w-full h-full" />
       ))}

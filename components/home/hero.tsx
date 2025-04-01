@@ -1,8 +1,11 @@
-"use client";
+"use client"
 
-import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { useEffect, useState } from "react";
+import { getAllBanners } from "@/lib/actions/banner"
+import { cn } from "@/lib/utils"
+import { urlFor } from "@/sanity/lib/image"
+import { Banners } from "@/sanity/types"
+import Link from "next/link"
+import { useEffect, useLayoutEffect, useState } from "react"
 
 const links = [
   { label: "Gorila", path: "gorila" },
@@ -13,45 +16,89 @@ const links = [
   { label: "Siberiano", path: "siberiano" },
   { label: "Erizo", path: "erizo" },
   { label: "Unicornio", path: "unicornio" },
-];
+]
 
 export function Hero() {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [images, setImages] = useState([
-    { src: "/gato.webp", alt: "Imagen de un gato", isActive: true },
-    { src: "/gato-2.webp", alt: "Imagen de un perro", isActive: false },
-    { src: "/totoro.webp", alt: "Imagen de un zorro", isActive: false },
-    { src: "/unicornio.webp", alt: "Imagen de un conejo", isActive: false },
-  ]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [images, setImages] = useState<Banners[]>([])
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex: number) =>
         prevIndex === images.length - 1 ? 0 : prevIndex + 1
-      );
+      )
       setImages((prevImages) =>
         prevImages.map((image, index) => ({
           ...image,
           isActive: index === (currentImageIndex + 1) % images.length,
         }))
-      );
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [currentImageIndex, images.length]);
+      )
+    }, 4000)
+    return () => clearInterval(interval)
+  }, [currentImageIndex, images.length])
+
+  useLayoutEffect(() => {
+    if (images.length > 0) {
+      const columnStart =
+        images.length === 1
+          ? 2
+          : images.length === 2
+            ? 3
+            : images.length === 3
+              ? 4
+              : images.length === 4
+                ? 5
+                : 6
+      const columnEnd = 7
+
+      document.documentElement.style.setProperty(
+        "--dynamic-column",
+        `${columnStart} / ${columnEnd}`
+      )
+    }
+  }, [images.length])
+
+  useEffect(() => {
+    async function fetchBanners() {
+      try {
+        const { banners } = await getAllBanners()
+        setImages(banners)
+      } catch (error) {
+        console.error("Error fetching banners:", error)
+      }
+    }
+    fetchBanners()
+  }, [])
 
   return (
     <div className="wrapped-bento mb-12">
-      {images.map(({ alt, src, isActive }) => (
-        <div key={alt} className="list-images">
+      {images.map(({ _id, image, isActive }, index) => (
+        <div
+          key={_id}
+          className="list-images cursor-pointer"
+          style={{
+            borderBottomRightRadius:
+              index === images.length - 1 ? "var(--_br)" : "0",
+          }}
+          onClick={() => {
+            setCurrentImageIndex(index)
+            setImages((prevImages) =>
+              prevImages.map((img, i) => ({
+                ...img,
+                isActive: i === index,
+              }))
+            )
+          }}
+        >
           <img
-            src={src}
-            alt={alt}
+            src={image ? urlFor(image).url() : "/placeholder-image.webp"}
+            alt={image?.alt || "Imagen del producto"}
             className={cn(isActive ? "" : "grayscale")}
           />
         </div>
       ))}
 
-      <div className="big-image">
+      <Link href={`${images[currentImageIndex]?.link}`} className="big-image">
         <div className="degrade" />
         <div className="text-big-image flex h-full max-w-2xl justify-end items-end px-16 py-14">
           <span className="font-[family-name:var(--font-bento)] text-8xl text-white">
@@ -59,10 +106,14 @@ export function Hero() {
           </span>
         </div>
         <img
-          src={images[currentImageIndex].src}
-          alt={images[currentImageIndex].alt}
+          src={
+            images[currentImageIndex]?.image
+              ? urlFor(images[currentImageIndex].image).url()
+              : "/placeholder-image.webp"
+          }
+          alt={images[currentImageIndex]?.image?.alt || "Imagen del producto"}
         />
-      </div>
+      </Link>
 
       <div className="fox-large-image">
         <div className="degrade" />
@@ -70,22 +121,23 @@ export function Hero() {
           <span className="text-3xl text-white font-bold mb-3">Peluches</span>
           <div className="flex flex-wrap gap-3">
             {links.map(({ path, label }) => (
-              <Link href={`/${path}`} key={path}>
-                <div className="text-md font-bold inline-flex items-center rounded-full bg-secondary text-secondary-foreground py-1 px-5">
-                  {label}
-                </div>
-              </Link>
+              <div
+                key={path}
+                className="text-md font-bold inline-flex items-center rounded-full bg-secondary text-secondary-foreground py-1 px-5"
+              >
+                {label}
+              </div>
             ))}
           </div>
         </div>
         <img src={"/fox.webp"} alt={"alt"} />
       </div>
 
-      <div className="button-right">
+      <Link href={"/ofertas"} className="button-right">
         <div className="message font-[family-name:var(--font-nexus)] text-8xl">
           Ofertas
         </div>
-      </div>
+      </Link>
 
       <div className="store-image">
         <div className="direction font-bold z-10 flex justify-between items-center px-12">
@@ -109,5 +161,5 @@ export function Hero() {
         </div>
       </div>
     </div>
-  );
+  )
 }

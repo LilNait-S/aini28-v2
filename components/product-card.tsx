@@ -1,8 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-
-import { Heart, ShoppingCart } from "lucide-react"
+import { ShoppingCart } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 import { Badge } from "./ui/badge"
@@ -52,9 +51,9 @@ export function ProductCard({
             className="rounded-3xl w-full h-full aspect-square object-cover"
           />
         </Link>
-        <button className="group transition-colors duration-300 ease-in-out bg-background absolute top-2 right-2 p-2 rounded-full cursor-pointer invisible group-hover/card:visible">
+        {/* <button className="group transition-colors duration-300 ease-in-out bg-background absolute top-2 right-2 p-2 rounded-full cursor-pointer invisible group-hover/card:visible">
           <Heart className="size-5 group-hover:stroke-red-600" />
-        </button>
+        </button> */}
       </picture>
       <div className="flex flex-col w-full h-full">
         <div className="flex items-start space-x-2">
