@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
 import { allSizes } from "@/constants/sizes"
+import { useCartState } from "@/lib/states/shopping-car"
 import { cn } from "@/lib/utils"
 import { Product } from "@/sanity/types"
 import {
@@ -15,8 +16,9 @@ import {
   Repeat,
   ShoppingCart,
 } from "lucide-react"
-import { parseAsInteger, parseAsString, useQueryState } from "nuqs"
+import { parseAsString, useQueryState } from "nuqs"
 import { useState } from "react"
+import { toast } from "sonner"
 
 export function PelucheClient({ peluche }: { peluche: Product }) {
   const { sizePricing } = peluche
@@ -30,10 +32,7 @@ export function PelucheClient({ peluche }: { peluche: Product }) {
       )
   )
 
-  const [qty, setQty] = useQueryState(
-    "qty",
-    parseAsInteger.withOptions({ history: "replace" }).withDefault(1)
-  )
+  // const [qty, setQty] = useState<number>(1)
 
   const [price, setPrice] = useState<number | undefined>(
     sizePricing?.find((s) => s.size === Number(size))?.price
@@ -48,10 +47,14 @@ export function PelucheClient({ peluche }: { peluche: Product }) {
       sizePricing?.find((s) => s.size === Number(size))?.unit
     }`
   )
+
+  const { onAddToCart, qty, decQty, incQty } = useCartState()
   return (
     <>
       <div className="flex items-start space-x-2">
-        <span className="text-5xl font-bold">S/.{salePrice ? salePrice.toFixed(2) : price?.toFixed(2)}</span>
+        <span className="text-5xl font-bold">
+          S/.{salePrice ? salePrice.toFixed(2) : price?.toFixed(2)}
+        </span>
         {salePrice && (
           <div className="flex space-x-1 items-center">
             <span className="line-through text-muted-foreground">
@@ -75,7 +78,9 @@ export function PelucheClient({ peluche }: { peluche: Product }) {
             const price = matchingSize?.price ?? null
             const approximateSize = matchingSize?.approximateSize ?? null
             const unit = matchingSize?.unit ?? ""
-            const salePrice = sizePricing?.find((s) => s.size === staticSize)?.salePrice
+            const salePrice = sizePricing?.find(
+              (s) => s.size === staticSize
+            )?.salePrice
 
             return (
               <label
@@ -111,9 +116,9 @@ export function PelucheClient({ peluche }: { peluche: Product }) {
           <Button
             className="rounded-none shadow-none first:rounded-s-full last:rounded-e-full focus-visible:z-10"
             variant="secondary"
-            aria-label="Upqty"
+            aria-label="Decrease quantity"
             disabled={qty <= 1}
-            onClick={() => setQty(qty - 1)}
+            onClick={() => decQty()}
           >
             <ChevronDown size={16} strokeWidth={2} aria-hidden="true" />
           </Button>
@@ -123,14 +128,46 @@ export function PelucheClient({ peluche }: { peluche: Product }) {
           <Button
             className="rounded-none shadow-none first:rounded-s-full last:rounded-e-full focus-visible:z-10"
             variant="secondary"
-            aria-label="Downqty"
+            aria-label="Increase quantity"
             disabled={qty >= 50}
-            onClick={() => setQty(qty + 1)}
+            onClick={() => incQty()}
           >
             <ChevronUp size={16} strokeWidth={2} aria-hidden="true" />
           </Button>
         </div>
-        <Button className="shrink-1 w-full">
+        <Button
+          type="button"
+          className="shrink-1 w-full"
+          onClick={() => {
+            const selectedSize = sizePricing?.find(
+              (s) => s.size === Number(size)
+            )?.size
+            if (!selectedSize) {
+              toast.error("Por favor, selecciona un tamaño válido.")
+              return
+            }
+
+            const finalPrice = salePrice ?? price
+            if (!finalPrice) {
+              toast.error("El precio del producto no es válido.")
+              return
+            }
+
+            if (qty < 1 || qty > 50) {
+              toast.error("La cantidad debe estar entre 1 y 50.")
+              return
+            }
+
+            onAddToCart({
+              product: peluche,
+              qty,
+              selectedSize,
+              price: finalPrice,
+            })
+
+            toast.success("Producto agregado al carrito.")
+          }}
+        >
           <ShoppingCart />
           Agregar al Carrito
         </Button>
