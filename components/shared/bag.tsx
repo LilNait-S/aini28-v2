@@ -164,7 +164,9 @@ export function Bag() {
                                 S/.{price.toFixed(2)}
                               </p>
                             )}
-                            <div className="font-medium">S/.{finalPrice.toFixed(2)}</div>
+                            <div className="font-medium">
+                              S/.{finalPrice.toFixed(2)}
+                            </div>
                           </div>
                         </div>
                       </div>
