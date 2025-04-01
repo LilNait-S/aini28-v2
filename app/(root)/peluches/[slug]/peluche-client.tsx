@@ -145,6 +145,11 @@ export function PelucheClient({ peluche }: { peluche: Product }) {
               return
             }
 
+            if (!price) {
+              toast.error("El precio del producto no es válido.")
+              return
+            }
+
             const finalPrice = salePrice ?? price
             if (!finalPrice) {
               toast.error("El precio del producto no es válido.")
@@ -157,10 +162,14 @@ export function PelucheClient({ peluche }: { peluche: Product }) {
             }
 
             onAddToCart({
-              product: peluche,
+              _id: peluche._id,
+              images: peluche.images,
+              name: peluche.name ?? "",
               qty,
               selectedSize,
-              price: finalPrice,
+              price,
+              salePrice,
+              finalPrice,
             })
 
             toast.success("Producto agregado al carrito.")

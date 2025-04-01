@@ -11,6 +11,8 @@ import { ScrollArea, ScrollBar } from "./ui/scroll-area"
 import { Product } from "@/sanity/types"
 import { parseSize } from "@/utils/parse-size"
 import { urlFor } from "@/sanity/lib/image"
+import { toast } from "sonner"
+import { useCartState } from "@/lib/states/shopping-car"
 
 export function ProductCard({
   name,
@@ -18,6 +20,7 @@ export function ProductCard({
   slug,
   sizePricing,
   className,
+  _id,
 }: Product & { className?: string }) {
   const [currentPrice, setCurrentPrice] = useState<number | undefined>(
     sizePricing?.[0]?.price
@@ -25,6 +28,10 @@ export function ProductCard({
   const [currentSalePrice, setCurrentSalePrice] = useState<number | undefined>(
     sizePricing?.[0]?.salePrice
   )
+
+  const [size, setSize] = useState<number | undefined>(sizePricing?.[0]?.size)
+
+  const { onAddToCart } = useCartState()
 
   return (
     <article
@@ -81,6 +88,7 @@ export function ProductCard({
                 onClick={() => {
                   setCurrentPrice(price)
                   setCurrentSalePrice(salePrice)
+                  setSize(size)
                 }}
                 className={cn(
                   "cursor-pointer",
@@ -93,7 +101,42 @@ export function ProductCard({
         </div>
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
-      <Button>
+      <Button
+        type="button"
+        onClick={() => {
+          const selectedSize = sizePricing?.find(
+            (s) => s.size === Number(size)
+          )?.size
+          if (!selectedSize) {
+            toast.error("Por favor, selecciona un tamaño válido.")
+            return
+          }
+
+          if (!currentPrice) {
+            toast.error("El precio del producto no es válido.")
+            return
+          }
+
+          const finalPrice = currentSalePrice ?? currentPrice
+          if (!finalPrice) {
+            toast.error("El precio del producto no es válido.")
+            return
+          }
+
+          onAddToCart({
+            _id,
+            images: images,
+            name: name ?? "",
+            qty: 1,
+            selectedSize,
+            price: currentPrice,
+            salePrice: currentSalePrice,
+            finalPrice,
+          })
+
+          toast.success("Producto agregado al carrito.")
+        }}
+      >
         <ShoppingCart />
         Agregar al carrito
       </Button>

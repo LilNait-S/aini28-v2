@@ -3,9 +3,13 @@ import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
 interface ProductCart {
-  product: Product
+  _id: string
+  images: Product["images"]
+  name: string
   qty: number
   price: number
+  salePrice?: number
+  finalPrice: number
   selectedSize: number
 }
 
@@ -19,16 +23,15 @@ type State = {
 
 type Action = {
   onAddToCart: ({
+    _id,
+    images,
+    name,
     price,
-    product,
+    salePrice,
+    finalPrice,
     qty,
     selectedSize,
-  }: {
-    product: Product
-    qty: number
-    price: number
-    selectedSize: number
-  }) => void
+  }: ProductCart) => void
   onRemove: (productId: string, selectedSize: number) => void
   toggleCartItemQuantity: ({
     _id,
@@ -44,7 +47,7 @@ type Action = {
 }
 
 const calculateTotals = (items: ProductCart[]) => {
-  const totalPrice = items.reduce((acc, item) => acc + item.price * item.qty, 0)
+  const totalPrice = items.reduce((acc, item) => acc + item.finalPrice * item.qty, 0)
   const totalQuantities = items.reduce((acc, item) => acc + item.qty, 0)
   return { totalPrice, totalQuantities }
 }
@@ -58,13 +61,20 @@ export const useCartState = create(
       showCart: false,
       totalQuantities: 0,
 
-      onAddToCart: ({ product, price, qty, selectedSize }) => {
+      onAddToCart: ({
+        _id,
+        price,
+        salePrice,
+        finalPrice,
+        qty,
+        selectedSize,
+        images,
+        name,
+      }) => {
         const { cartItems } = get()
 
         const existingProductIndex = cartItems.findIndex(
-          (item) =>
-            item.product._id === product._id &&
-            item.selectedSize === selectedSize
+          (item) => item._id === _id && item.selectedSize === selectedSize
         )
 
         const existingProduct = cartItems[existingProductIndex]
@@ -81,8 +91,12 @@ export const useCartState = create(
           updatedCartItems = [
             ...cartItems,
             {
-              product,
+              _id,
+              images,
+              name,
               price,
+              salePrice,
+              finalPrice,
               qty,
               selectedSize,
             },
@@ -103,10 +117,7 @@ export const useCartState = create(
         const { cartItems } = get()
         const updatedCartItems = cartItems.filter(
           (item) =>
-            !(
-              item.product._id === productId &&
-              item.selectedSize === selectedSize
-            )
+            !(item._id === productId && item.selectedSize === selectedSize)
         )
 
         const { totalPrice, totalQuantities } =
@@ -122,8 +133,7 @@ export const useCartState = create(
       toggleCartItemQuantity: ({ _id, selectedSize, value }) => {
         const { cartItems } = get()
         const index = cartItems.findIndex(
-          (item) =>
-            item.product._id === _id && item.selectedSize === selectedSize
+          (item) => item._id === _id && item.selectedSize === selectedSize
         )
         const product = cartItems[index]
         if (!product) return
