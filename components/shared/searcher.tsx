@@ -83,7 +83,7 @@ export function Searcher() {
     <div className="relative" ref={searchContainerRef}>
       <div className="flex items-center">
         <div
-          className={`flex items-center border rounded-full overflow-hidden transition-all duration-300 bg-white ${
+          className={`flex items-center bg-border/50 rounded-full overflow-hidden transition-all duration-300 ${
             isExpanded ? "w-64" : "w-10"
           }`}
         >
@@ -99,7 +99,7 @@ export function Searcher() {
           <input
             ref={inputRef}
             type="text"
-            placeholder="Buscar productos..."
+            placeholder="Unicornio, oso, doraemon..."
             className={`outline-none px-2 py-1 w-full transition-all text-sm ${
               isExpanded ? "opacity-100" : "opacity-0 w-0"
             }`}
