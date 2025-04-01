@@ -32,8 +32,6 @@ export function PelucheClient({ peluche }: { peluche: Product }) {
       )
   )
 
-  // const [qty, setQty] = useState<number>(1)
-
   const [price, setPrice] = useState<number | undefined>(
     sizePricing?.find((s) => s.size === Number(size))?.price
   )
