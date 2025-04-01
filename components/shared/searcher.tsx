@@ -111,13 +111,13 @@ export function Searcher() {
       </div>
 
       {isLoading && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-md shadow-lg z-10 p-8 text-center">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-md shadow-lg z-50 p-8 text-center">
           <LoadingSpinner />
         </div>
       )}
 
       {searchResults.length > 0 && isExpanded && !isLoading && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-md shadow-lg z-10">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-md shadow-lg z-50">
           <ScrollArea
             className={cn("h-fit w-full", searchResults.length > 4 && "h-72")}
           >
