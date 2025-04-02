@@ -2,7 +2,7 @@ import { Product } from "@/sanity/types"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
-interface ProductCart {
+export interface ProductCart {
   _id: string
   images: Product["images"]
   name: string

@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import {
   Sheet,
   SheetContent,
@@ -17,6 +17,8 @@ import { ChevronDown, ChevronUp, ShoppingBag, Trash2 } from "lucide-react"
 import { Separator } from "../ui/separator"
 import { ScrollArea } from "../ui/scroll-area"
 import { cn } from "@/lib/utils"
+import Link from "next/link"
+import { useState } from "react"
 
 export function Bag() {
   const {
@@ -27,8 +29,10 @@ export function Bag() {
     onRemove,
   } = useCartState()
 
+  const [open, setOpen] = useState(false)
+
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button variant="secondary" className="rounded-full">
           <ShoppingBag />
@@ -186,7 +190,14 @@ export function Bag() {
                     <span>Precio total</span>
                     <span>S/.{totalPrice.toFixed(2)}</span>
                   </div>
-                  <Button className="w-full">Finalizar compra</Button>
+                  <Link
+                    href={`/checkout/summary`}
+                    className={cn(buttonVariants(), "w-full")}
+                    onClick={() => setOpen(false)}
+                    aria-label="Proceed to checkout"
+                  >
+                    Finalizar compra
+                  </Link>
                 </SheetFooter>
               </div>
             </>
