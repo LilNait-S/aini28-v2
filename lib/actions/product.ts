@@ -22,6 +22,7 @@ type ProductsFilters = Partial<{
   sort?: SortOption
   page?: number
   pageSize?: number
+  hasSalePrice?: boolean
 }>
 
 /**
@@ -45,6 +46,7 @@ export async function getAllPeluches(
       sort: null,
       page: 1,
       pageSize: 8,
+      hasSalePrice: false,
     }
 
     // Merge provided filters with default filters
@@ -56,7 +58,12 @@ export async function getAllPeluches(
 
     // Fetch paginated products
     const products: Product[] = await client.fetch(
-      getProductsQuery({ sort: finalFilters.sort, start, end }),
+      getProductsQuery({
+        sort: finalFilters.sort,
+        start,
+        end,
+        hasSalePrice: finalFilters.hasSalePrice,
+      }),
       finalFilters
     )
 
@@ -121,7 +128,7 @@ export async function incrementProductLikes(slug: string): Promise<void> {
 
     await writeClient
       .patch(product._id)
-      .set({ likes: product.likes + 1}) // Set the current likes
+      .set({ likes: product.likes + 1 }) // Set the current likes
       // .setIfMissing({ likes: 0 }) // Ensure the "likes" field exists
       // .inc({ likes: 1 }) // Increment the like counter
       .commit()

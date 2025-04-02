@@ -7,16 +7,19 @@ import { defineQuery } from "next-sanity"
  * @param {SortOption | null} [params.sort] - Tipo de ordenamiento (ej. "name-asc", "name-desc").
  * @param {number} [params.start=0] - Índice inicial para la paginación.
  * @param {number} [params.end=10] - Índice final para la paginación.
+ * @param {boolean} [params.hasSalePrice=false] - Filtra cualquier producto que tenga un precio de oferta (salePrice) mayor a 0.
  * @returns {string} - Consulta GROQ generada dinámicamente.
  */
 export function getProductsQuery({
   sort = null,
   start = 0,
   end = 10,
+  hasSalePrice = false,
 }: {
   sort?: SortOption | null
   start?: number
   end?: number
+  hasSalePrice?: boolean
 } = {}) {
   // Mapeo de opciones de ordenamiento
   const orderBy: Record<Exclude<SortOption, null>, string> = {
@@ -44,6 +47,7 @@ export function getProductsQuery({
       ))
       && defined(sizePricing) 
       && count(sizePricing[isActive == $isActive && (!defined($size) || size == $size)]) > 0
+      ${hasSalePrice ? "&& count(sizePricing[salePrice > 0]) > 0" : ""} // Filtro por salePrice
     ] 
     | order(${orderClause}) [${start}...${end}] {
       _id,
@@ -101,5 +105,5 @@ export function getProductBySlug() {
       isActive,
       likes
     }
-  `);
+  `)
 }
