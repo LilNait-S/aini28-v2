@@ -8,8 +8,11 @@ export function Footer() {
       <footer className="container max-w-7xl mx-auto">
         <div className="grid grid-cols-3 place-content-center">
           <picture className="flex justify-center items-center">
-            <img src="/libro.webp" alt="libro de reclamaciones" />
+            <Link href={"/claims-book"}>
+              <img src="/libro.webp" alt="libro de reclamaciones" />
+            </Link>
           </picture>
+
           <div className="flex flex-col gap-4 justify-center items-center">
             <Link href="/" className="py-2">
               <LogoAini28 />

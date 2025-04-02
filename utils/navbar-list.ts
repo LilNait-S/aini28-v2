@@ -20,11 +20,6 @@ export function getNavbarList({ pathname }: { pathname: string }): Menu[] {
       active: pathname.includes("/peluches"),
     },
     {
-      label: "Moda",
-      href: "/moda",
-      active: pathname.includes("/moda"),
-    },
-    {
       label: "Ofertas",
       href: "/ofertas",
       active: pathname.includes("/ofertas"),

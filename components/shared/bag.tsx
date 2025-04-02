@@ -49,7 +49,8 @@ export function Bag() {
         <div className="p-6 flex flex-col justify-between h-full">
           {cartItems.length === 0 ? (
             <p className="text-center text-muted-foreground py-6">
-              Your cart is empty
+              Tu carrito está vacio. Agrega algunos peluches para empezar a
+              comprar.
             </p>
           ) : (
             <>

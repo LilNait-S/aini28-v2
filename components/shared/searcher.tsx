@@ -20,7 +20,6 @@ export function Searcher() {
   const inputRef = useRef<HTMLInputElement>(null)
   const searchContainerRef = useRef<HTMLDivElement>(null)
 
-  // Debounced search term
   const debouncedSearchTerm = useDebounce(searchTerm, 500)
 
   const handleSearchClick = () => {
@@ -40,12 +39,11 @@ export function Searcher() {
     setIsLoading(true)
 
     try {
-      console.log("term", term)
       const results = await getAllPeluches({
         search: `*${term}*`,
         pageSize: 10,
       })
-      console.log("products", results.products)
+
       setSearchResults(results.products)
     } catch (error) {
       console.error("Error fetching search results:", error)
