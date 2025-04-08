@@ -69,7 +69,9 @@ export async function getAllPeluches(
 
     // Fetch total number of products
     const totalProducts: number = await client.fetch(
-      getTotalProductsQuery(),
+      getTotalProductsQuery({
+        hasSalePrice: finalFilters.hasSalePrice,
+      }),
       finalFilters
     )
 

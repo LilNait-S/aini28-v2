@@ -14,7 +14,6 @@ export function PeluchesQueryContainer({
   peluchesPromise,
 }: PeluchesQueryContainerProps) {
   const { products, totalPages } = use(peluchesPromise)
-
   const [currentPage, setCurrentPage] = useQueryState(
     "page",
     parseAsInteger

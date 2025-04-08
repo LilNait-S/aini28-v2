@@ -35,10 +35,11 @@ export function ProductCard({
   return (
     <article
       className={cn(
-        "group/card bg-slate-50 flex flex-col space-y-2 min-w-[260px] w-[260px] h-[460px] shadow-sm p-5 rounded-4xl",
+        "group/card bg-slate-50 flex flex-col space-y-2 w-full sm:w-full h-auto sm:h-full shadow-sm p-5 rounded-4xl",
         className
       )}
     >
+      {/* Imagen del producto */}
       <picture className="relative">
         <Link href={`/peluches/${slug?.current}`}>
           <img
@@ -48,16 +49,15 @@ export function ProductCard({
                 : "/placeholder-image.webp"
             }
             alt={images?.[0]?.alt || "Imagen del producto"}
-            className="rounded-3xl w-full h-full aspect-square object-cover"
+            className="rounded-3xl w-full h-auto sm:h-full aspect-square object-cover"
           />
         </Link>
-        {/* <button className="group transition-colors duration-300 ease-in-out bg-background absolute top-2 right-2 p-2 rounded-full cursor-pointer invisible group-hover/card:visible">
-          <Heart className="size-5 group-hover:stroke-red-600" />
-        </button> */}
       </picture>
+
+      {/* Información del producto */}
       <div className="flex flex-col w-full h-full">
-        <div className="flex items-start space-x-2">
-          <span className="text-xl font-bold">
+        <div className="flex flex-col sm:flex-row items-start space-x-2">
+          <span className="text-lg sm:text-xl font-bold">
             S/.
             {currentSalePrice
               ? currentSalePrice.toFixed(2)
@@ -72,10 +72,12 @@ export function ProductCard({
             </div>
           )}
         </div>
-        <h3 className="text-lg font-semibold line-clamp-2 pr-5 text-wrap">
+        <h3 className="text-sm sm:text-lg font-semibold line-clamp-2 pr-5 text-wrap">
           {name}
         </h3>
       </div>
+
+      {/* Tamaños disponibles */}
       <ScrollArea className="whitespace-nowrap">
         <div className="flex space-x-2 pb-3">
           {sizePricing
@@ -100,6 +102,8 @@ export function ProductCard({
         </div>
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
+
+      {/* Botón de agregar al carrito */}
       <Button
         type="button"
         onClick={() => {
@@ -135,6 +139,7 @@ export function ProductCard({
 
           toast.success("Producto agregado al carrito.")
         }}
+        className="text-xs sm:text-base"
       >
         <ShoppingCart />
         Agregar al carrito

@@ -4,6 +4,8 @@ import { getPeluchesSchema } from "@/lib/validations/search/products"
 import { Params } from "@/types/params"
 import { FiltersToolbar } from "../peluches/filters-toolbar"
 import { PeluchesQueryContainer } from "../peluches/peluches-query-container"
+import { Suspense } from "react"
+import { LoadingSpinner } from "@/components/ui/loading-spinner"
 
 export default async function Ofertas({ searchParams }: Params) {
   const search = getPeluchesSchema.parse(await searchParams)
@@ -13,7 +15,9 @@ export default async function Ofertas({ searchParams }: Params) {
     <Container>
       <section className="space-y-8 pt-4 pb-20">
         <FiltersToolbar />
-        <PeluchesQueryContainer peluchesPromise={peluches} />
+        <Suspense fallback={<LoadingSpinner />}>
+          <PeluchesQueryContainer peluchesPromise={peluches} />
+        </Suspense>
       </section>
     </Container>
   )

@@ -70,7 +70,11 @@ export function getProductsQuery({
 /**
  * Genera una consulta optimizada para contar la cantidad total de productos según los filtros.
  */
-export function getTotalProductsQuery() {
+export function getTotalProductsQuery({
+  hasSalePrice = false,
+}: {
+  hasSalePrice?: boolean
+} = {}) {
   return defineQuery(`
     count(*[_type == "product"
       && (!defined($search) || name match $search)
@@ -78,6 +82,7 @@ export function getTotalProductsQuery() {
       && (!defined($category) || category._ref == $category)
       && (!defined($minPrice) || !defined($maxPrice) || count(sizePricing[price >= $minPrice && price <= $maxPrice]) > 0)
       && count(sizePricing[isActive == $isActive && (!defined($size) || size == $size)]) > 0
+      ${hasSalePrice ? "&& count(sizePricing[salePrice > 0]) > 0" : ""} // Filtro por salePrice
     ])
   `)
 }

@@ -82,7 +82,7 @@ export function Searcher() {
       <div className="flex items-center">
         <div
           className={`flex items-center bg-border/50 rounded-full overflow-hidden transition-all duration-300 ${
-            isExpanded ? "w-64" : "w-10"
+            isExpanded ? "w-44 md:w-64" : "w-10"
           }`}
         >
           <Button
