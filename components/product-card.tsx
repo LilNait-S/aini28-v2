@@ -39,7 +39,6 @@ export function ProductCard({
         className
       )}
     >
-      {/* Imagen del producto */}
       <picture className="relative">
         <Link href={`/peluches/${slug?.current}`}>
           <img
@@ -54,7 +53,6 @@ export function ProductCard({
         </Link>
       </picture>
 
-      {/* Información del producto */}
       <div className="flex flex-col w-full h-full">
         <div className="flex flex-col sm:flex-row items-start space-x-2">
           <span className="text-lg sm:text-xl font-bold">
@@ -77,7 +75,6 @@ export function ProductCard({
         </h3>
       </div>
 
-      {/* Tamaños disponibles */}
       <ScrollArea className="whitespace-nowrap">
         <div className="flex space-x-2 pb-3">
           {sizePricing
@@ -103,7 +100,6 @@ export function ProductCard({
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
 
-      {/* Botón de agregar al carrito */}
       <Button
         type="button"
         onClick={() => {
@@ -139,10 +135,11 @@ export function ProductCard({
 
           toast.success("Producto agregado al carrito.")
         }}
-        className="text-xs sm:text-base"
+        className="text-xs sm:text-base flex items-center gap-2"
       >
         <ShoppingCart />
-        Agregar al carrito
+        <span className="block lg:hidden">Agregar</span>
+        <span className="hidden lg:block">Agregar al carrito</span>
       </Button>
     </article>
   )

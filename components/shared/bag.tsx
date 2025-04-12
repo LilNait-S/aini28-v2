@@ -50,14 +50,14 @@ export function Bag() {
             Estos son los peluches que elegiste. ¿Listo para confirmar?
           </SheetDescription>
         </SheetHeader>
-        <div className="p-6 flex flex-col justify-between h-full">
+        <div className="h-full flex justify-center items-center">
           {cartItems.length === 0 ? (
             <p className="text-center text-muted-foreground py-6">
               Tu carrito está vacio. Agrega algunos peluches para empezar a
               comprar.
             </p>
           ) : (
-            <>
+            <div className="px-6 flex flex-col justify-between h-full w-full">
               <ScrollArea className="max-h-[60vh]">
                 <div className="space-y-4 pr-4">
                   {cartItems.map(
@@ -200,7 +200,7 @@ export function Bag() {
                   </Link>
                 </SheetFooter>
               </div>
-            </>
+            </div>
           )}
         </div>
       </SheetContent>

@@ -12,26 +12,27 @@ export default async function Peluche({ params }: Params) {
   const { name, code, slug: Slug, likes } = peluche
 
   return (
-    <Container>
+    <Container className="pb-40">
       <section className="flex flex-col">
         <header className="py-4">
           <PelucheBreadcrumb pelucheName={name} />
         </header>
-        <main className="grid grid-cols-2 gap-12">
+
+        <main className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           <PelucheImages peluche={peluche} />
+
           <div className="flex flex-col space-y-4">
             <div className="flex justify-between items-center mb-0">
               <span className="text-primary">Aini28</span>
               <span>{code}</span>
             </div>
-            <h1 className="text-4xl font-bold tracking-tight">{name}</h1>
+            <h1 className="text-2xl sm:text-4xl font-bold tracking-tight">
+              {name}
+            </h1>
             <LikeCounter slug={Slug} initialLikes={likes} />
             <PelucheClient peluche={peluche} />
           </div>
         </main>
-        <footer className="flex flex-col items-center justify-center py-4 my-20">
-          <h3 className="text-3xl font-bold">Mas peluches bonitos para ti</h3>
-        </footer>
       </section>
     </Container>
   )

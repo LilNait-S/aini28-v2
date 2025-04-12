@@ -4,6 +4,7 @@ import { useCartState } from "@/lib/states/shopping-car"
 import { CheckoutForm } from "./checkout-form"
 import { OrderSummary } from "./order-summary"
 import { ProductList } from "./product-list"
+import { Separator } from "@/components/ui/separator"
 
 export default function Summary() {
   const { cartItems, totalPrice } = useCartState()
@@ -13,9 +14,9 @@ export default function Summary() {
         Resumen de Compra
       </h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg shadow-md border border-border p-6">
+      <div className="grid grid-cols-3 gap-8">
+        <div className="col-span-2 border-r-1 border-border pr-8">
+          <div>
             <h2 className="text-xl font-semibold mb-4">
               Productos en tu Carrito
             </h2>
@@ -23,8 +24,8 @@ export default function Summary() {
           </div>
         </div>
 
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow-md border border-border p-6 mb-6">
+        <div className="flex flex-col gap-12">
+          <div>
             <h2 className="text-xl font-semibold mb-4">Resumen del Pedido</h2>
             <OrderSummary
               subtotal={totalPrice}
@@ -33,7 +34,9 @@ export default function Summary() {
             />
           </div>
 
-          <div className="bg-white rounded-lg shadow-md border border-border p-6">
+          <Separator />
+
+          <div>
             <h2 className="text-xl font-semibold mb-4">Datos de Contacto</h2>
             <CheckoutForm />
           </div>
