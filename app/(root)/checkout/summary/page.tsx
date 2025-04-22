@@ -13,7 +13,7 @@ export default function Summary() {
 
   if (cartItems.length === 0) {
     return (
-      <Container className="h-[calc(100vh_-_22rem)] flex flex-col items-center justify-center">
+      <Container className="h-[calc(100dvh_-_22rem)] flex flex-col items-center justify-center">
         <h1 className="text-2xl md:text-3xl font-bold !mb-0">
           Tu carrito está vacío
         </h1>
@@ -31,7 +31,7 @@ export default function Summary() {
   }
 
   return (
-    <Container>
+    <Container className="pb-20">
       <h1 className="text-2xl md:text-3xl font-bold mb-8 text-center">
         Resumen de Compra
       </h1>
