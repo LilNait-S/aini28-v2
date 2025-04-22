@@ -5,6 +5,7 @@ import { TypographyP } from "@/components/typography-p"
 import { Button } from "@/components/ui/button"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
+import { COMPANY } from "@/constants/phone-company"
 import { allSizes } from "@/constants/sizes"
 import { useCartState } from "@/lib/states/shopping-car"
 import { cn } from "@/lib/utils"
@@ -53,6 +54,20 @@ export function PelucheClient({
   )
 
   const { onAddToCart, qty, decQty, incQty } = useCartState()
+
+  function sendMessage({ name, slug }: { name?: string; slug: string }) {
+    const mensaje =
+      `Hola! Tengo algunas preguntas sobre este producto:\n\n` +
+      `Nombre del producto: ${name}\n` +
+      `Enlace al producto: ${window.location.origin}/peluches/${slug}\n\n` +
+      `¿Podrían ayudarme con más información?`
+
+    const url = `https://wa.me/${COMPANY.phoneNumber}?text=${encodeURIComponent(mensaje)}`
+
+    // Redirigir al usuario a WhatsApp
+    window.open(url, "_blank")
+  }
+
   return (
     <>
       <div className="flex items-start space-x-2">
@@ -187,7 +202,11 @@ export function PelucheClient({
         </Button>
       </div>
       <div className="flex space-x-4">
-        <button className="flex items-center justify-center gap-1 cursor-pointer w-full">
+        <button
+          className="flex items-center justify-center gap-1 cursor-pointer w-full"
+          type="button"
+          onClick={() => sendMessage({ name: peluche.name, slug })}
+        >
           <MessageCircle className="size-3.5 stroke-muted-foreground" />
           <span className="text-sm text-muted-foreground">Chat</span>
         </button>

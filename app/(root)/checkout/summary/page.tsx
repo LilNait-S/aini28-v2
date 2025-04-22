@@ -36,7 +36,7 @@ export default function Summary() {
         Resumen de Compra
       </h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-8">
         <div className="order-2 lg:order-1 col-span-2 lg:border-r-1 lg:border-border lg:pr-8">
           <div>
             <h2 className="text-xl font-semibold mb-4">
