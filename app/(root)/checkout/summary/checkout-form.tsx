@@ -1,74 +1,116 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { Country, CountryDropdown } from "@/components/ui/country-dropdown"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { CountryData, PhoneInput } from "@/components/ui/phone-input"
+import { customerContactSchema } from "@/lib/validations/customer-contact"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
 
 export function CheckoutForm() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
+  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null)
+  const [countryData, setCountryData] = useState<CountryData>()
+  const form = useForm<z.infer<typeof customerContactSchema>>({
+    resolver: zodResolver(customerContactSchema),
+    defaultValues: {
+      fullName: "",
+      email: "",
+      phoneNumber: "",
+    },
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+  console.log("countryData", countryData)
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Here you would typically send the form data to your backend
-    console.log("Form submitted:", formData)
-    alert("¡Pedido confirmado! Gracias por tu compra.")
+  function onSubmit(values: z.infer<typeof customerContactSchema>) {
+    console.log(values)
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="name">Nombre completo</Label>
-        <Input
-          id="name"
-          name="name"
-          placeholder="Tu nombre"
-          required
-          value={formData.name}
-          onChange={handleChange}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="fullName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nombre completo</FormLabel>
+              <FormControl>
+                <Input placeholder="Escribe tu nombre completo" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="email">Correo electrónico</Label>
-        <Input
-          id="email"
+        <FormField
+          control={form.control}
           name="email"
-          type="email"
-          placeholder="tu@email.com"
-          required
-          value={formData.email}
-          onChange={handleChange}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Correo electrónico</FormLabel>
+              <FormControl>
+                <Input placeholder="tu@correo.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="phone">Teléfono</Label>
-        <Input
-          id="phone"
-          name="phone"
-          type="tel"
-          placeholder="123456789"
-          required
-          value={formData.phone}
-          onChange={handleChange}
+        <FormField
+          control={form.control}
+          name="phoneNumber"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Celular</FormLabel>
+              <FormControl>
+                <div className="flex items-center w-full">
+                  <CountryDropdown
+                    onChange={(country) => {
+                      setSelectedCountry(country)
+                      setCountryData(country)
+
+                      const countryCode = country.countryCallingCodes[0]
+                      const formattedCode = countryCode.startsWith("+")
+                        ? countryCode
+                        : `+${countryCode}`
+                      form.setValue("phoneNumber", formattedCode)
+                    }}
+                    defaultValue={selectedCountry?.alpha3}
+                    inline
+                  />
+                  <PhoneInput
+                    {...field}
+                    value={field.value}
+                    placeholder="Ej: +51987654321"
+                    defaultCountry={selectedCountry?.alpha2}
+                    onCountryChange={(country) => {
+                      setCountryData(country)
+                      setSelectedCountry(country as Country)
+                    }}
+                    inline
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <Button type="submit" className="w-full mt-6">
-        Confirmar Pedido
-      </Button>
-    </form>
+        <Button type="submit" className="w-full mt-6">
+          Confirmar Pedido
+        </Button>
+      </form>
+    </Form>
   )
 }

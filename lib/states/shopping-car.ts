@@ -11,6 +11,7 @@ export interface ProductCart {
   salePrice?: number
   finalPrice: number
   selectedSize: number
+  slug: string
 }
 
 type State = {
@@ -31,6 +32,7 @@ type Action = {
     finalPrice,
     qty,
     selectedSize,
+    slug,
   }: ProductCart) => void
   onRemove: (productId: string, selectedSize: number) => void
   toggleCartItemQuantity: ({
@@ -47,7 +49,10 @@ type Action = {
 }
 
 const calculateTotals = (items: ProductCart[]) => {
-  const totalPrice = items.reduce((acc, item) => acc + item.finalPrice * item.qty, 0)
+  const totalPrice = items.reduce(
+    (acc, item) => acc + item.finalPrice * item.qty,
+    0
+  )
   const totalQuantities = items.reduce((acc, item) => acc + item.qty, 0)
   return { totalPrice, totalQuantities }
 }
@@ -70,6 +75,7 @@ export const useCartState = create(
         selectedSize,
         images,
         name,
+        slug,
       }) => {
         const { cartItems } = get()
 
@@ -99,6 +105,7 @@ export const useCartState = create(
               finalPrice,
               qty,
               selectedSize,
+              slug,
             },
           ]
         }

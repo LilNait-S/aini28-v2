@@ -1,5 +1,6 @@
 import { ProductCart } from "@/lib/states/shopping-car"
 import { urlFor } from "@/sanity/lib/image"
+import Link from "next/link"
 
 interface ProductListProps {
   products: ProductCart[]
@@ -18,12 +19,13 @@ export function ProductList({ products }: ProductListProps) {
           qty,
           selectedSize,
           salePrice,
+          slug,
         }) => (
-          <div
-            key={_id + selectedSize}
-            className="py-4 flex flex-col sm:flex-row"
-          >
-            <div className="flex-shrink-0 mr-4 mb-4 sm:mb-0">
+          <div key={_id + selectedSize} className="py-4 flex">
+            <Link
+              href={`/peluches/${slug}`}
+              className="flex-shrink-0 mr-4 mb-4 sm:mb-0"
+            >
               <img
                 src={
                   images?.[0]
@@ -31,29 +33,39 @@ export function ProductList({ products }: ProductListProps) {
                     : "/placeholder-image.webp"
                 }
                 alt={images?.[0]?.alt || "Imagen del producto"}
-                width={80}
-                height={80}
+                width={150}
+                height={150}
                 className="rounded-xl object-cover"
               />
-            </div>
+            </Link>
             <div className="flex-grow">
-              <h3 className="text-lg font-medium">{name}</h3>
+              <h3 className="text-lg font-semibold">{name}</h3>
               <div className="mt-2 flex flex-col sm:flex-row sm:justify-between">
                 <div className="text-sm text-muted-foreground mb-2 sm:mb-0">
                   <span>Cantidad: {qty}</span>
                 </div>
                 <div className="text-sm">
-                  <span className="text-muted-foreground">
-                    Precio unitario:{" "}
-                  </span>
-                  {salePrice !== undefined && (
-                    <p className="text-sm line-through text-muted-foreground">
-                      S/.{price.toFixed(2)}
-                    </p>
+                  {salePrice ? (
+                    <div className="flex flex-col">
+                      <div className="flex items-center justify-end space-x-1 mb-2 sm:mb-0">
+                        <span className="text-muted-foreground">Antes: </span>
+                        <p className="text-sm line-through text-muted-foreground">
+                          S/.{price.toFixed(2)}
+                        </p>
+                      </div>
+                      <div className="flex text-xl items-center justify-end space-x-1 mb-2 sm:mb-0 text-primary font-bold">
+                        <span>Oferta: </span>
+                        <span>S/.{salePrice.toFixed(2)}</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-end space-x-1 mb-2 sm:mb-0">
+                      <span className="text-muted-foreground">
+                        Precio unitario:{" "}
+                      </span>
+                      <span className="font-medium">S/.{price.toFixed(2)}</span>
+                    </div>
                   )}
-                  <span className="font-medium">
-                    S/.{finalPrice.toFixed(2)}
-                  </span>
                 </div>
               </div>
               <div className="mt-2 text-right">

@@ -14,7 +14,7 @@ export const phoneSchema = z.string().refine((value) => {
   } catch {
     return false
   }
-}, "Invalid phone number")
+}, "Numero de celular invalido")
 
 export type CountryData = {
   alpha2: string
@@ -114,7 +114,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
         if (parsed && parsed.country) {
           // Update flag first
           const countryCode = parsed.country
-          console.log("Setting flag to:", countryCode.toLowerCase())
+          // console.log("Setting flag to:", countryCode.toLowerCase())
 
           // Force immediate update
           setDisplayFlag("") // Clear first

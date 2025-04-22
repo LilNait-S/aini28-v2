@@ -122,6 +122,11 @@ export function ProductCard({
             return
           }
 
+          if (!slug?.current) {
+            toast.error("El slug del producto no es válido.")
+            return
+          }
+
           onAddToCart({
             _id,
             images: images,
@@ -131,6 +136,7 @@ export function ProductCard({
             price: currentPrice,
             salePrice: currentSalePrice,
             finalPrice,
+            slug: slug.current,
           })
 
           toast.success("Producto agregado al carrito.")
