@@ -30,7 +30,7 @@ export default async function Peluche({ params }: Params) {
               {name}
             </h1>
             <LikeCounter slug={Slug} initialLikes={likes} />
-            <PelucheClient peluche={peluche} />
+            <PelucheClient peluche={peluche} slug={slug} />
           </div>
         </main>
       </section>

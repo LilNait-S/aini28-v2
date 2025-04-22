@@ -20,7 +20,13 @@ import { parseAsString, useQueryState } from "nuqs"
 import { useState } from "react"
 import { toast } from "sonner"
 
-export function PelucheClient({ peluche }: { peluche: Product }) {
+export function PelucheClient({
+  peluche,
+  slug,
+}: {
+  peluche: Product
+  slug: string
+}) {
   const { sizePricing } = peluche
 
   const [size, setSize] = useQueryState(
@@ -170,6 +176,7 @@ export function PelucheClient({ peluche }: { peluche: Product }) {
               price,
               salePrice,
               finalPrice,
+              slug,
             })
 
             toast.success("Producto agregado al carrito.")
