@@ -40,16 +40,8 @@ export function Hero() {
 
   useLayoutEffect(() => {
     if (images.length > 0) {
-      const columnStart =
-        images.length === 1
-          ? 2
-          : images.length === 2
-            ? 3
-            : images.length === 3
-              ? 4
-              : images.length === 4
-                ? 5
-                : 6
+      const calculateColumnStart = (length: number) => Math.min(length + 1, 6)
+      const columnStart = calculateColumnStart(images.length)
       const columnEnd = 7
 
       document.documentElement.style.setProperty(
