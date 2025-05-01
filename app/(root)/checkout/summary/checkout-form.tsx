@@ -22,12 +22,17 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
-import { customerContactSchema } from "@/lib/validations/customer-contact"
-import { cleanObject } from "@/utils/clean-object"
+import { useCartState } from "@/lib/states/shopping-car"
+import {
+  CustomerContact,
+  customerContactSchema,
+} from "@/lib/validations/customer-contact"
+import { useOrder } from "@/services/api/order"
+import { OrderPayload } from "@/types/order"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
-import { z } from "zod"
+import { toast } from "sonner"
 import {
   departamentosPeru,
   distritosPorProvincia,
@@ -35,66 +40,43 @@ import {
   provinciasLima,
   shippingMethods,
 } from "./checkout-data"
-import { useCartState } from "@/lib/states/shopping-car"
-import { io, Socket } from "socket.io-client"
-import { environment, makeBasePath } from "@/services/api/base"
 
 export function CheckoutForm() {
   const { cartItems } = useCartState()
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null)
-  const form = useForm<z.infer<typeof customerContactSchema>>({
+  const { createOrder, loading } = useOrder()
+  const form = useForm<CustomerContact>({
     resolver: zodResolver(customerContactSchema),
     defaultValues: {
       fullName: "",
       email: "",
       phoneNumber: "",
-      country: "peru",
+      country: "Peru",
       department: "",
+      paymentMethod: "",
+      shippingMethod: "",
       province: "",
       district: "",
       address: "",
     },
   })
 
-  const socketRef = useRef<Socket | null>(null)
-
-  const socketURL = makeBasePath(environment, false)
-  console.log("🔗 Intentando conectar al socket en:", socketURL)
-
-  useEffect(() => {
-    if (!socketRef.current) {
-      console.log("socket1")
-      const socket = io(makeBasePath(environment, false), {
-        transports: ["websocket"],
-        rejectUnauthorized: environment !== "development",
+  function onSubmit(values: CustomerContact) {
+    const orderDetails: OrderPayload = { userDetails: values, cartItems }
+    createOrder(orderDetails)
+      .then(() => {
+        toast.success("Pedido realizado correctamente", {
+          description:
+            "Tu pedido ha sido enviado. Pronto recibirás confirmación.",
+        })
+        form.reset()
       })
-
-      socketRef.current = socket
-
-      console.log("socket2", socket)
-
-      socket.on("connect", () => {
-        console.log("✅ Socket connected:", socket.connected)
+      .catch(() => {
+        toast.error("Error al enviar pedido", {
+          description:
+            "Ocurrió un error al procesar tu pedido. Intenta nuevamente.",
+        })
       })
-
-      socket.on("connect_error", (err) => {
-        console.error("❌ Socket connection error:", err.message)
-      })
-
-      socket.on("disconnect", (reason) => {
-        console.warn("⚠️ Socket disconnected:", reason)
-      })
-    }
-
-    return () => {
-      socketRef.current?.disconnect()
-    }
-  }, [])
-
-  function onSubmit(values: z.infer<typeof customerContactSchema>) {
-    const orderDetails = { userDetails: cleanObject(values), cartItems }
-    console.log("Order details:", orderDetails)
-    socketRef.current?.emit("order", orderDetails)
   }
 
   const { watch } = form
@@ -174,10 +156,7 @@ export function CheckoutForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel htmlFor="paymentMethod">Metodo de pago</FormLabel>
-              <Select
-                onValueChange={(value) => field.onChange(Number(value))}
-                value={field.value}
-              >
+              <Select onValueChange={field.onChange} value={field.value}>
                 <SelectTrigger id="paymentMethod" className="w-full">
                   <SelectValue placeholder="Selecciona un metodo de pago" />
                 </SelectTrigger>
@@ -200,10 +179,7 @@ export function CheckoutForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel htmlFor="shippingMethod">Metodo de envio</FormLabel>
-              <Select
-                onValueChange={(value) => field.onChange(Number(value))}
-                value={field.value}
-              >
+              <Select onValueChange={field.onChange} value={field.value}>
                 <SelectTrigger id="shippingMethod" className="w-full">
                   <SelectValue placeholder="Selecciona un metodo de envio" />
                 </SelectTrigger>
@@ -220,7 +196,7 @@ export function CheckoutForm() {
           )}
         />
 
-        {watch("shippingMethod") === 1 && (
+        {watch("shippingMethod") === "Envío Estándar" && (
           <>
             <Separator />
             <h2 className="text-xl font-semibold mb-4">Información de envío</h2>
@@ -232,7 +208,7 @@ export function CheckoutForm() {
                 <FormItem>
                   <FormLabel htmlFor="country">Pais</FormLabel>
                   <Select
-                    value="peru"
+                    value="Peru"
                     disabled
                     onValueChange={field.onChange}
                     defaultValue={field.value}
@@ -243,7 +219,7 @@ export function CheckoutForm() {
                     <SelectContent>
                       <SelectGroup>
                         <SelectLabel>Fruits</SelectLabel>
-                        <SelectItem value="peru">Perú</SelectItem>
+                        <SelectItem value="Peru">Perú</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -382,9 +358,11 @@ export function CheckoutForm() {
         <Button
           type="submit"
           className="w-full mt-6"
-          disabled={!cartItems.length || form.formState.isSubmitting}
+          disabled={!cartItems.length || form.formState.isSubmitting || loading}
         >
-          {form.formState.isSubmitting ? "Cargando..." : "Confirmar pedido"}
+          {form.formState.isSubmitting || loading
+            ? "Cargando..."
+            : "Confirmar pedido"}
         </Button>
       </form>
     </Form>

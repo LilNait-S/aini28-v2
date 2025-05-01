@@ -11,16 +11,14 @@ export const customerContactSchema = z.object({
     ),
   phoneNumber: phoneSchema,
   email: z.string().email("Debe ser un correo electrónico válido"),
-  paymentMethod: z.number(),
-  shippingMethod: z.number(),
+  paymentMethod: z.string(),
+  shippingMethod: z.string(),
 
   country: z.string().optional(),
   department: z.string().optional(),
   province: z.string().optional(),
   district: z.string().optional(),
-  address: z
-    .string()
-    .min(5, "La dirección debe tener al menos 5 caracteres")
-    .max(100, "La dirección no puede exceder los 100 caracteres")
-    .optional(),
+  address: z.string().optional(),
 })
+
+export type CustomerContact = z.infer<typeof customerContactSchema>

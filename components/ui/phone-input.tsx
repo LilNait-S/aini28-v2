@@ -37,6 +37,7 @@ interface PhoneInputProps
   defaultCountry?: string
   className?: string
   inline?: boolean
+  setNationalNumber?: (number: string) => void
 }
 
 export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
@@ -49,6 +50,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
       placeholder,
       defaultCountry,
       inline = false,
+      setNationalNumber,
       ...props
     },
     ref
@@ -110,6 +112,8 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
           getURI: parsed?.getURI(),
           parsed: parsed,
         })
+
+        setNationalNumber?.(parsed?.nationalNumber || "")
 
         if (parsed && parsed.country) {
           // Update flag first

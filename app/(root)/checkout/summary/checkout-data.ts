@@ -216,11 +216,11 @@ export const distritosPorProvincia = {
 }
 
 export const paymentMethods = [
-  { label: "Transferencia Bancaria", value: 1 },
-  { label: "Yape", value: 2 },
+  { label: "Transferencia Bancaria", value: "Transferencia Bancaria" },
+  { label: "Yape", value: "Yape" },
 ]
 
 export const shippingMethods = [
-  { label: "Envío Estándar", value: 1 },
-  { label: "Recogida en Tienda", value: 2 },
+  { label: "Envío Estándar", value: "Envío Estándar" },
+  { label: "Recogida en Tienda", value: "Recogida en Tienda" },
 ]
