@@ -7,6 +7,7 @@ import { Banners } from "@/sanity/types"
 import Link from "next/link"
 import { useEffect, useLayoutEffect, useState } from "react"
 import { ScrollArea, ScrollBar } from "../ui/scroll-area"
+import { HeroDesktopSkeleton } from "./skeletons/hero-desktop-skeleton"
 
 const links = [
   { label: "Gorila", path: "gorila" },
@@ -22,6 +23,7 @@ const links = [
 export function Hero() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [images, setImages] = useState<Banners[]>([])
+  const [loadingImages, setLoadingImages] = useState(true)
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -54,14 +56,23 @@ export function Hero() {
   useEffect(() => {
     async function fetchBanners() {
       try {
+        setLoadingImages(true)
         const { banners } = await getAllBanners()
         setImages(banners)
       } catch (error) {
         console.error("Error fetching banners:", error)
+      } finally {
+        setLoadingImages(false)
       }
     }
     fetchBanners()
   }, [])
+
+  if (loadingImages) {
+    return (
+      <HeroDesktopSkeleton />
+    )
+  }
 
   return (
     <>
