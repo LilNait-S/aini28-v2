@@ -11,11 +11,7 @@ import {
 } from "@/components/ui/card"
 import { redirect } from "next/navigation"
 
-export default function ConfirmacionPedido({
-  searchParams,
-}: {
-  searchParams: { orderId?: string }
-}) {
+export default function ConfirmacionPedido() {
   const orderId = 1
 
   // Redireccionar si no hay ID de pedido
