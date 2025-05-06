@@ -173,6 +173,8 @@ export default function WhatsappConnection() {
     )
   }
 
+  const activeNumber = phoneNumbers?.find((number) => number.status === true)
+
   return (
     <div className="container mx-auto py-10">
       <Card className="max-w-md mx-auto">
@@ -284,7 +286,7 @@ export default function WhatsappConnection() {
                             )
                             return
                           }
-                          
+
                           try {
                             await deleteNumber(id)
                             toast.success("Número eliminado correctamente", {
@@ -309,28 +311,28 @@ export default function WhatsappConnection() {
             )}
           </div>
 
-          <div className="mt-6 p-4 bg-green-50 border border-green-200  rounded-md">
-            <h3 className="font-medium text-green-800 mb-2">
-              Número Activo Actual
-            </h3>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="h-3 w-3 bg-green-500 rounded-full mr-2 animate-pulse"></div>
-                <span className="text-lg font-bold text-green-800">
-                  {phoneNumbers?.find((number) => number.status === true)
-                    ?.countryCode +
-                    " " +
-                    phoneNumbers?.find((number) => number.status === true)
-                      ?.numberToSendMessage}
-                </span>
+          {activeNumber && (
+            <div className="mt-6 p-4 bg-green-50 border border-green-200  rounded-md">
+              <h3 className="font-medium text-green-800 mb-2">
+                Número Activo Actual
+              </h3>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="h-3 w-3 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                  <span className="text-lg font-bold text-green-800">
+                    {activeNumber.countryCode +
+                      " " +
+                      activeNumber.numberToSendMessage}
+                  </span>
+                </div>
+                <Check className="h-5 w-5 text-green-600" />
               </div>
-              <Check className="h-5 w-5 text-green-600" />
+              <p className="text-xs text-green-700 mt-2">
+                Este número seleccionado será al que le lleguen los mensajes de
+                las órdenes de pedidos
+              </p>
             </div>
-            <p className="text-xs text-green-700 mt-2">
-              Este número seleccionado será al que le lleguen los mensajes de
-              las órdenes de pedidos
-            </p>
-          </div>
+          )}
 
           {/* Nueva sección para escanear QR */}
           <div className="mt-8 p-4 bg-primary/10 border border-primary/50 rounded-md">
