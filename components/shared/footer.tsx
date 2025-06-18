@@ -24,16 +24,16 @@ export function Footer() {
               <IsoLogoAini28 />
             </Link>
             <div className="flex space-x-3">
-              <a
-                href="https://www.instagram.com"
+              {/* <a
+                href="https://www.instagram.com/aini28.store/"
                 className="cursor-pointer"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <IconInstagram className="transition duration-200 ease-in-out fill-slate-500 hover:fill-primary w-6 h-6" />
-              </a>
+              </a> */}
               <a
-                href="https://www.tiktok.com"
+                href="https://www.tiktok.com/@aini28.store"
                 className="cursor-pointer"
                 target="_blank"
                 rel="noopener noreferrer"

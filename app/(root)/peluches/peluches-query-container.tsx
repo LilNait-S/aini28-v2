@@ -5,6 +5,7 @@ import { use } from "react"
 import { PeluchesContainer } from "./peluches-container"
 import { PaginationContainer } from "@/components/pagination-container"
 import { parseAsInteger, useQueryState } from "nuqs"
+import { EmptyView } from "./empty-peluches"
 
 interface PeluchesQueryContainerProps {
   peluchesPromise: ReturnType<typeof getAllPeluches>
@@ -26,6 +27,11 @@ export function PeluchesQueryContainer({
       setCurrentPage(page)
     }
   }
+
+  if (products.length === 0) {
+    return <EmptyView />
+  }
+
   return (
     <div className="flex flex-col space-y-12">
       <PeluchesContainer peluches={products} />

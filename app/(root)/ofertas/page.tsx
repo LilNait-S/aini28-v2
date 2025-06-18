@@ -15,7 +15,13 @@ export default async function Ofertas({ searchParams }: Params) {
     <Container>
       <section className="space-y-8 pt-4 pb-20">
         <FiltersToolbar />
-        <Suspense fallback={<LoadingSpinner />}>
+        <Suspense
+          fallback={
+            <div className="flex flex-col items-center justify-center min-h-[500px] p-8 text-center">
+              <LoadingSpinner />
+            </div>
+          }
+        >
           <PeluchesQueryContainer peluchesPromise={peluches} />
         </Suspense>
       </section>

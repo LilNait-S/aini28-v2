@@ -27,12 +27,17 @@ import {
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
-import { claimsBookSchema } from "@/lib/validations/claims-book"
+import {
+  ClaimsBookPayload,
+  claimsBookSchema,
+} from "@/lib/validations/claims-book"
 import { Container } from "@/components/container"
 import { es } from "date-fns/locale"
+import axios from "axios"
 
 export default function ReclamacionForm() {
   const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const form = useForm<z.infer<typeof claimsBookSchema>>({
     resolver: zodResolver(claimsBookSchema),
@@ -51,8 +56,19 @@ export default function ReclamacionForm() {
     },
   })
 
+  const sendClaim = async (payload: ClaimsBookPayload) => {
+    try {
+      setLoading(true)
+      await axios.post("/api/send-claim", payload)
+      setLoading(false)
+    } catch (err) {
+      setLoading(false)
+      throw err
+    }
+  }
+
   function onSubmit(values: z.infer<typeof claimsBookSchema>) {
-    console.log(values)
+    sendClaim(values)
     setSubmitted(true)
   }
 
@@ -86,19 +102,19 @@ export default function ReclamacionForm() {
 
   return (
     <Container className="pt-16 pb-32">
-      <h1 className="text-3xl font-bold text-center mb-8">
+      <h1 className="text-4xl font-bold text-center mb-8">
         Libro de Reclamaciones
       </h1>
+      <p className="text-center text-muted-foreground mb-12">
+        Conforme a lo establecido en el Código de Protección y Defensa del
+        Consumidor, este establecimiento cuenta con un Libro de Reclamaciones a
+        tu disposición.
+      </p>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <div className="bg-yellow-50 p-4 rounded-md border border-yellow-200 mb-6">
-            <p className="text-sm text-yellow-800">
-              Conforme a lo establecido en el Código de Protección y Defensa del
-              Consumidor, este establecimiento cuenta con un Libro de
-              Reclamaciones a tu disposición.
-            </p>
-          </div>
-
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-8 bg-white p-6 rounded-lg shadow-md"
+        >
           <div className="space-y-6">
             <h2 className="text-xl font-semibold border-b pb-2">
               1. Identificación del Consumidor
@@ -141,7 +157,7 @@ export default function ReclamacionForm() {
                       <RadioGroup
                         onValueChange={field.onChange}
                         defaultValue={field.value}
-                        className="flex space-x-1"
+                        className="flex space-x-4"
                       >
                         <div className="flex items-center space-x-2">
                           <RadioGroupItem value="dni" id="dni" />
@@ -361,8 +377,9 @@ export default function ReclamacionForm() {
               type="submit"
               className="w-full md:w-auto md:!pl-7"
               size="lg"
+              disabled={loading}
             >
-              Enviar Reclamación
+              {loading ? "Enviando..." : "Enviar Reclamación"}
               <ChevronRight />
             </Button>
           </div>

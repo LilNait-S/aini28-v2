@@ -24,3 +24,4 @@ export const claimsBookSchema = z.object({
     required_error: "La fecha es requerida",
   }),
 })
+export type ClaimsBookPayload = z.infer<typeof claimsBookSchema>

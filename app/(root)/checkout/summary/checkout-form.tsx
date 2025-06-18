@@ -40,11 +40,13 @@ import {
   provinciasLima,
   shippingMethods,
 } from "./checkout-data"
+import { useRouter } from "next/navigation"
 
 export function CheckoutForm() {
-  const { cartItems } = useCartState()
+  const { cartItems, resetCart } = useCartState()
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null)
   const { createOrder, loading } = useOrder()
+  const { push } = useRouter()
   const form = useForm<CustomerContact>({
     resolver: zodResolver(customerContactSchema),
     defaultValues: {
@@ -70,6 +72,8 @@ export function CheckoutForm() {
             "Tu pedido ha sido enviado. Pronto recibirás confirmación.",
         })
         form.reset()
+        resetCart()
+        push("/checkout/confirmation")
       })
       .catch(() => {
         toast.error("Error al enviar pedido", {

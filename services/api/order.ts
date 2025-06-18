@@ -1,6 +1,6 @@
 import { OrderPayload } from "@/types/order"
 import { useState } from "react"
-import { genericAuthRequest } from "./base"
+import axios from "axios"
 
 export const useOrder = (onSuccess?: () => void) => {
   const [loading, setLoading] = useState(false)
@@ -10,7 +10,12 @@ export const useOrder = (onSuccess?: () => void) => {
     setLoading(true)
     setError(null)
     try {
-      await genericAuthRequest("post", `/orders`, payload)
+      // // Crear la orden
+      // await genericAuthRequest("post", `/orders`, payload)
+
+      // Enviar el correo
+      await axios.post("/api/send-email", payload)
+
       if (onSuccess) onSuccess()
     } catch (err) {
       setError(err)

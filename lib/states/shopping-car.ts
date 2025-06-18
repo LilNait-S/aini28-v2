@@ -46,6 +46,7 @@ type Action = {
   }) => void
   incQty: () => void
   decQty: () => void
+  resetCart: () => void
 }
 
 const calculateTotals = (items: ProductCart[]) => {
@@ -175,6 +176,14 @@ export const useCartState = create(
         set((state) => ({
           qty: state.qty > 1 ? state.qty - 1 : state.qty,
         })),
+
+      resetCart: () => {
+        set({
+          cartItems: [],
+          totalPrice: 0,
+          totalQuantities: 0,
+        })
+      },
     }),
     {
       name: "cart-storage",
