@@ -1,6 +1,6 @@
 import Link from "next/link"
+import { IconFacebook, IconTikTok } from "../icons"
 import { IsoLogoAini28 } from "./logo-aini"
-import { IconFacebook, IconInstagram, IconTikTok } from "../icons"
 
 export function Footer() {
   return (

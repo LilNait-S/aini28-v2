@@ -135,15 +135,6 @@ const nextConfig: NextConfig = {
   generateEtags: true, // ETags para caching
   compress: true, // Compresión gzip
 
-  // Configuración experimental para mejor performance
-  experimental: {
-    // Optimizar CSS
-    optimizeCss: true,
-
-    // Preload de páginas críticas
-    optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
-  },
-
   // Webpack optimizations
   webpack: (config, { isServer }) => {
     if (!isServer) {
