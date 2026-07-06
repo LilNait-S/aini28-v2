@@ -29,6 +29,7 @@ import {
 } from "@/lib/validations/customer-contact"
 import { useOrder } from "@/services/api/order"
 import { OrderPayload } from "@/types/order"
+import { Turnstile, captchaEnabled } from "@/components/security/turnstile"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
@@ -45,6 +46,7 @@ import { useRouter } from "next/navigation"
 export function CheckoutForm() {
   const { cartItems, resetCart } = useCartState()
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null)
+  const [captchaToken, setCaptchaToken] = useState("")
   const { createOrder, loading } = useOrder()
   const { push } = useRouter()
   const form = useForm<CustomerContact>({
@@ -64,7 +66,11 @@ export function CheckoutForm() {
   })
 
   function onSubmit(values: CustomerContact) {
-    const orderDetails: OrderPayload = { userDetails: values, cartItems }
+    const orderDetails: OrderPayload = {
+      userDetails: values,
+      cartItems,
+      captchaToken,
+    }
     createOrder(orderDetails)
       .then(() => {
         toast.success("Pedido realizado correctamente", {
@@ -359,10 +365,17 @@ export function CheckoutForm() {
           </>
         )}
 
+        <Turnstile onToken={setCaptchaToken} />
+
         <Button
           type="submit"
           className="w-full mt-6"
-          disabled={!cartItems.length || form.formState.isSubmitting || loading}
+          disabled={
+            !cartItems.length ||
+            form.formState.isSubmitting ||
+            loading ||
+            (captchaEnabled && !captchaToken)
+          }
         >
           {form.formState.isSubmitting || loading
             ? "Cargando..."

@@ -2,6 +2,7 @@
 
 import { Product } from "@/sanity/types"
 import { urlFor } from "@/sanity/lib/image"
+import { safeJsonLd } from "@/lib/seo/json-ld"
 
 interface ProductSchemaProps {
   peluche: Product
@@ -70,7 +71,7 @@ export function ProductSchema({ peluche, slug }: ProductSchemaProps) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: safeJsonLd(schema) }}
     />
   )
 }

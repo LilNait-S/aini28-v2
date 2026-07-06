@@ -1,12 +1,32 @@
 import OrderSummaryEmail from "@/components/email/order-summary-email"
-import { OrderPayload } from "@/types/order"
+import { guardMailRequest } from "@/lib/security/request-guards"
+import { orderPayloadSchema } from "@/lib/validations/order"
 import { render } from "@react-email/render"
 import { NextRequest, NextResponse } from "next/server"
 import nodemailer from "nodemailer"
 import React from "react"
 
 export async function POST(req: NextRequest) {
-  const payload = (await req.json()) as OrderPayload
+  let body: unknown
+  try {
+    body = await req.json()
+  } catch {
+    return NextResponse.json({ message: "JSON inválido" }, { status: 400 })
+  }
+
+  const guardResponse = await guardMailRequest(req, body, {
+    routeId: "send-email",
+  })
+  if (guardResponse) return guardResponse
+
+  const parsed = orderPayloadSchema.safeParse(body)
+  if (!parsed.success) {
+    return NextResponse.json(
+      { message: "Datos del pedido inválidos" },
+      { status: 400 }
+    )
+  }
+  const payload = parsed.data
 
   const transporter = nodemailer.createTransport({
     service: "gmail",

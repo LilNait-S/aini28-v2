@@ -1,5 +1,6 @@
 import ClaimsBookEmail from "@/components/email/claims-book-email"
-import { ClaimsBookPayload } from "@/lib/validations/claims-book"
+import { claimsBookApiSchema } from "@/lib/validations/claims-book"
+import { guardMailRequest } from "@/lib/security/request-guards"
 import { render } from "@react-email/render"
 import { NextRequest, NextResponse } from "next/server"
 import nodemailer from "nodemailer"
@@ -7,7 +8,26 @@ import React from "react"
 
 export async function POST(req: NextRequest) {
   try {
-    const payload = (await req.json()) as ClaimsBookPayload
+    let body: unknown
+    try {
+      body = await req.json()
+    } catch {
+      return NextResponse.json({ message: "JSON inválido" }, { status: 400 })
+    }
+
+    const guardResponse = await guardMailRequest(req, body, {
+      routeId: "send-claim",
+    })
+    if (guardResponse) return guardResponse
+
+    const parsed = claimsBookApiSchema.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json(
+        { message: "Datos de la reclamación inválidos" },
+        { status: 400 }
+      )
+    }
+    const payload = parsed.data
 
     const transporter = nodemailer.createTransport({
       service: "gmail",

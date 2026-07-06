@@ -30,7 +30,12 @@ const nextConfig: NextConfig = {
 
     // Optimización adicional
     minimumCacheTTL: 31536000, // 1 año
-    dangerouslyAllowSVG: true,
+
+    // SVG desactivado en el optimizador de imágenes: no se sirven SVG a través
+    // de next/image (los SVG locales usan <img> directo y las imágenes remotas
+    // provienen solo de cdn.sanity.io en formatos rasterizados). Se mantienen
+    // las mitigaciones por defensa en profundidad si en el futuro se reactiva.
+    dangerouslyAllowSVG: false,
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
@@ -49,10 +54,6 @@ const nextConfig: NextConfig = {
           {
             key: "X-Frame-Options",
             value: "DENY",
-          },
-          {
-            key: "X-XSS-Protection",
-            value: "1; mode=block",
           },
           {
             key: "Referrer-Policy",

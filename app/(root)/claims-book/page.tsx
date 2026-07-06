@@ -34,10 +34,12 @@ import {
 import { Container } from "@/components/container"
 import { es } from "date-fns/locale"
 import axios from "axios"
+import { Turnstile, captchaEnabled } from "@/components/security/turnstile"
 
 export default function ReclamacionForm() {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState("")
 
   const form = useForm<z.infer<typeof claimsBookSchema>>({
     resolver: zodResolver(claimsBookSchema),
@@ -59,7 +61,7 @@ export default function ReclamacionForm() {
   const sendClaim = async (payload: ClaimsBookPayload) => {
     try {
       setLoading(true)
-      await axios.post("/api/send-claim", payload)
+      await axios.post("/api/send-claim", { ...payload, captchaToken })
       setLoading(false)
     } catch (err) {
       setLoading(false)
@@ -372,12 +374,13 @@ export default function ReclamacionForm() {
             />
           </div>
 
-          <div className="pt-4 border-t">
+          <div className="pt-4 border-t space-y-4">
+            <Turnstile onToken={setCaptchaToken} />
             <Button
               type="submit"
               className="w-full md:w-auto md:!pl-7"
               size="lg"
-              disabled={loading}
+              disabled={loading || (captchaEnabled && !captchaToken)}
             >
               {loading ? "Enviando..." : "Enviar Reclamación"}
               <ChevronRight />

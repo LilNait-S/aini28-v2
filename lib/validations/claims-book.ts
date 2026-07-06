@@ -25,3 +25,11 @@ export const claimsBookSchema = z.object({
   }),
 })
 export type ClaimsBookPayload = z.infer<typeof claimsBookSchema>
+
+/**
+ * Variante para validar el payload en el endpoint API: al llegar como JSON,
+ * la fecha es un string, por lo que se convierte con `coerce`.
+ */
+export const claimsBookApiSchema = claimsBookSchema.extend({
+  fecha: z.coerce.date({ required_error: "La fecha es requerida" }),
+})
