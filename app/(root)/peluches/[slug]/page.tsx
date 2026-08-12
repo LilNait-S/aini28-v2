@@ -8,13 +8,24 @@ import { LikeCounter } from "./like-counter"
 import { ProductSchema } from "@/components/seo/product-schema"
 import type { Metadata } from "next"
 import { urlFor } from "@/sanity/lib/image"
+import { notFound } from "next/navigation"
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params
-  
+
   try {
     const peluche = await getPeluche({ slug })
-    
+
+    // Producto inexistente (eliminado): metadata de "no encontrado"
+    if (!peluche) {
+      return {
+        title: "Producto no encontrado - Aini28",
+        description:
+          "El producto que buscas no está disponible. Explora nuestra colección de peluches de calidad.",
+        robots: { index: false, follow: true },
+      }
+    }
+
     // Obtener precio y precio de oferta
     const activePricing = peluche.sizePricing?.find(s => s.isActive)
     const price = activePricing?.price || 0
@@ -119,6 +130,10 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 export default async function Peluche({ params }: Params) {
   const { slug } = await params
   const peluche = await getPeluche({ slug })
+
+  // Producto eliminado o inexistente → 404 en vez de crash server-side
+  if (!peluche) notFound()
+
   const { name, code, slug: Slug, likes } = peluche
 
   return (

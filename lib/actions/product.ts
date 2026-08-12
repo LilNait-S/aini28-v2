@@ -89,18 +89,20 @@ export async function getAllPeluches(
  * Fetches a single product (peluche) by its slug.
  * @param {Object} params - Parameters for the query.
  * @param {string} params.slug - The slug of the product to fetch.
- * @returns {Promise<Product>} - A promise resolving to the product.
- * @throws {Error} - Throws an error if the fetch operation fails or the product is not found.
+ * @returns {Promise<Product | null>} - A promise resolving to the product, or null if it doesn't exist.
+ * @throws {Error} - Throws an error only if the fetch operation itself fails.
  */
-export async function getPeluche({ slug }: { slug: string }): Promise<Product> {
+export async function getPeluche({
+  slug,
+}: {
+  slug: string
+}): Promise<Product | null> {
   try {
-    const product: Product = await client.fetch(getProductBySlug(), { slug })
+    const product: Product | null = await client.fetch(getProductBySlug(), {
+      slug,
+    })
 
-    if (!product) {
-      throw new Error(`Product with slug "${slug}" not found.`)
-    }
-
-    return product
+    return product ?? null
   } catch (error) {
     console.error("Error fetching product:", error)
     throw new Error("Failed to fetch product. Please try again later.")

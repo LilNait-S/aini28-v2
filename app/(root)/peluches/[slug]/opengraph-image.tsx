@@ -10,6 +10,10 @@ export default async function OpengraphImage({
 
   try {
     const peluche = await getPeluche({ slug })
+
+    // Producto eliminado/inexistente → usar la imagen de fallback (catch)
+    if (!peluche) throw new Error(`Product with slug "${slug}" not found.`)
+
     const firstImageUrl = peluche.images?.[0]?.asset?._ref
       ? `https://cdn.sanity.io/images/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET}/${peluche.images[0].asset._ref.replace("image-", "").replace("-webp", ".webp").replace("-jpg", ".jpg").replace("-png", ".png")}`
       : null
