@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { ScrollArea } from "../ui/scroll-area";
 import { LoadingSpinner } from "../ui/loading-spinner";
+import { cn } from "@/lib/utils";
 export function Searcher() {
   const [expanded, setExpanded] = useState(false);
   const [term, setTerm] = useState("");
@@ -53,7 +54,7 @@ export function Searcher() {
   }, []);
   return (
     <div className="relative" ref={container}>
-      <div className="flex items-center bg-border/50 rounded-full overflow-hidden">
+      <div className={cn("flex items-center bg-border/50 rounded-full overflow-hidden transition-all duration-300", expanded ? "w-44 md:w-64" : "w-10")}>
         <Button
           type="button"
           onClick={() => {
@@ -69,24 +70,20 @@ export function Searcher() {
           ref={input}
           placeholder="Unicornio, oso, doraemon..."
           aria-label="Buscar peluches"
-          className={
-            expanded
-              ? "outline-none px-2 py-1 w-36 md:w-56 text-sm"
-              : "w-0 opacity-0"
-          }
+          className={cn("outline-none px-2 py-1 w-full transition-all text-sm", expanded ? "opacity-100" : "opacity-0 w-0")}
           value={term}
           onFocus={() => setExpanded(true)}
           onChange={(e) => setTerm(e.target.value)}
         />
       </div>
       {expanded && loading && (
-        <div className="absolute top-full left-0 mt-1 bg-white border rounded-md z-50 p-8">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-md shadow-lg z-50 p-8 text-center">
           <LoadingSpinner />
         </div>
       )}
       {expanded && results.length > 0 && !loading && (
-        <div className="absolute top-full right-0 w-64 max-w-[90vw] mt-1 bg-white border rounded-md z-50">
-          <ScrollArea className="max-h-72">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-md shadow-lg z-50">
+          <ScrollArea className={cn("h-fit w-full", results.length > 4 && "h-72")}>
             <ul>
               {results.map((p) => (
                 <li key={p.id}>

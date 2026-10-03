@@ -9,9 +9,9 @@ export async function SizesSection() {
   if (!sizes.length) return null;
   return (
     <section className="flex flex-col lg:flex-row gap-4">
-      <div className="flex flex-col justify-center bg-slate-50 px-8 lg:px-12 rounded-4xl min-w-[200px] min-h-[200px]">
-        <span>Todos los</span>
-        <span className="text-primary font-bold text-2xl">Tamaños</span>
+      <div className="flex flex-col justify-center bg-slate-50 px-8 lg:px-12 rounded-4xl min-w-[200px] lg:min-w-[250px] min-h-[200px] lg:min-h-[250px]">
+        <span className="text-accent-foreground text-center lg:text-left">Todos los</span>
+        <span className="text-primary font-bold text-2xl lg:text-3xl text-center lg:text-left">Tamaños</span>
       </div>
       <div className="grid grid-cols-2 w-full gap-4">
         {sizes.map((size) => {
@@ -22,7 +22,7 @@ export async function SizesSection() {
             <Link
               key={size}
               href={`/peluches?size=${encodeURIComponent(size)}&page=1`}
-              className="flex flex-col lg:flex-row gap-4 bg-slate-50 rounded-4xl p-4 items-center"
+              className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4 bg-slate-50 rounded-4xl p-4 items-center"
             >
               <img
                 src={product?.imageUrl || "/placeholder-image.webp"}
@@ -31,7 +31,10 @@ export async function SizesSection() {
                 height={144}
                 className="rounded-3xl w-24 h-24 lg:w-36 lg:h-36 object-cover"
               />
-              <span className="text-primary font-bold text-xl">{size}</span>
+              <div className="flex flex-col w-full items-center">
+                <span className="text-accent-foreground/50 text-sm lg:text-base">Peluches</span>
+                <span className="text-primary font-bold text-xl lg:text-2xl">{size}</span>
+              </div>
             </Link>
           );
         })}

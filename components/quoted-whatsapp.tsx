@@ -2,6 +2,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import type { ProductCart } from "@/lib/states/shopping-car";
 
@@ -9,9 +10,11 @@ type Item = Pick<ProductCart, "_id" | "selectedSize" | "qty" | "finalPrice">;
 export function QuotedWhatsApp({
   items,
   onQuoted,
+  compact = false,
 }: {
   items: Item[];
   onQuoted?: (items: ProductCart[]) => void;
+  compact?: boolean;
 }) {
   const [loading, setLoading] = useState(false);
   const [prepared, setPrepared] = useState<{
@@ -73,11 +76,12 @@ export function QuotedWhatsApp({
       <Button
         type="button"
         variant="outline"
-        className="w-full"
+        className={compact ? "w-full border-0 shadow-none text-sm text-muted-foreground font-normal h-auto p-0 hover:bg-transparent" : "w-full"}
         disabled={loading || !items.length}
         onClick={() => prepare()}
       >
-        {loading ? "Consultando precios..." : "Preparar consulta por WhatsApp"}
+        {compact && <MessageCircle className="size-3.5" />}
+        {loading ? "Consultando precios..." : compact ? "Chat" : "Preparar consulta por WhatsApp"}
       </Button>
       {prepared && prepared.key === key && (
         <div className="rounded-xl border p-3 space-y-2">

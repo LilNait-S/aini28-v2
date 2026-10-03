@@ -4,6 +4,7 @@ import { ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import { type Product, variantLabel, effectivePrice } from "@/types/catalog";
 import { useCartState } from "@/lib/states/shopping-car";
@@ -27,49 +28,52 @@ export function ProductCard(
   return (
     <article
       className={cn(
-        "group/card bg-slate-50 flex flex-col space-y-2 w-full h-full shadow-sm p-5 rounded-4xl",
+        "group/card bg-slate-50 flex flex-col space-y-2 w-full sm:w-full h-auto sm:h-full shadow-sm p-5 rounded-4xl",
         product.className,
       )}
     >
+      <picture className="relative">
       <Link href={`/peluches/${product.slug}?variant=${selected.id}`}>
         <img
           src={product.imageUrl}
           alt={product.name}
           width={400}
           height={400}
-          className="rounded-3xl w-full aspect-square object-cover"
+          className="rounded-3xl w-full h-auto sm:h-full aspect-square object-cover"
         />
       </Link>
+      </picture>
       <div className="flex flex-col w-full h-full">
-        <div className="flex flex-wrap items-baseline gap-2">
+        <div className="flex flex-col sm:flex-row items-start space-x-2">
           <span className="text-lg sm:text-xl font-bold">
             S/.{price.toFixed(2)}
           </span>
           {price < Number(selected.normalPrice) && (
-            <span className="line-through text-muted-foreground text-sm">
+            <div className="flex space-x-1 items-center text-sm mt-0.5">
+            <span className="line-through text-muted-foreground">
               S/.{Number(selected.normalPrice).toFixed(2)}
             </span>
+            <p className="text-muted-foreground">Antes</p>
+            </div>
           )}
         </div>
-        <h3 className="text-sm sm:text-lg font-semibold line-clamp-2">
+        <h3 className="text-sm sm:text-lg font-semibold line-clamp-2 pr-5 text-wrap">
           <Link href={`/peluches/${product.slug}?variant=${selected.id}`}>{product.name}</Link>
         </h3>
       </div>
       <ScrollArea className="whitespace-nowrap">
         <div className="flex gap-2 pb-3">
           {product.variants.map((v) => (
+            <Badge asChild variant="secondary" key={v.id} className={cn("cursor-pointer", v.id === selected.id && "text-primary")}>
             <button
               key={v.id}
               type="button"
               aria-pressed={v.id === selected.id}
               onClick={() => setSelectedId(v.id)}
-              className={cn(
-                "rounded-full bg-secondary px-3 py-1 text-xs cursor-pointer",
-                v.id === selected.id && "text-primary ring-1 ring-primary",
-              )}
             >
-              {variantLabel(v)}
+              {v.attributes["Tamaño"] || variantLabel(v)}
             </button>
+            </Badge>
           ))}
         </div>
         <ScrollBar orientation="horizontal" />
@@ -94,7 +98,8 @@ export function ProductCard(
         className="text-xs sm:text-base flex gap-2"
       >
         <ShoppingCart />
-        <span>Agregar</span>
+        <span className="block lg:hidden">Agregar</span>
+        <span className="hidden lg:block">Agregar al carrito</span>
       </Button>
     </article>
   );
