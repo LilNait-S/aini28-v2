@@ -33,7 +33,7 @@ export function ProductCard(
       )}
     >
       <picture className="relative">
-      <Link href={`/peluches/${product.slug}?variant=${selected.id}`}>
+      <Link href={`/peluches/${product.slug}`}>
         <img
           src={product.imageUrl}
           alt={product.name}
@@ -58,7 +58,7 @@ export function ProductCard(
           )}
         </div>
         <h3 className="text-sm sm:text-lg font-semibold line-clamp-2 pr-5 text-wrap">
-          <Link href={`/peluches/${product.slug}?variant=${selected.id}`}>{product.name}</Link>
+          <Link href={`/peluches/${product.slug}`}>{product.name}</Link>
         </h3>
       </div>
       <ScrollArea className="whitespace-nowrap">
