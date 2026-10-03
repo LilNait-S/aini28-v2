@@ -1,15 +1,16 @@
-"use client"
+"use client";
+import { QuotedWhatsApp } from "@/components/quoted-whatsapp";
 
-import { useCartState } from "@/lib/states/shopping-car"
-import { CheckoutForm } from "./checkout-form"
-import { OrderSummary } from "./order-summary"
-import { ProductList } from "./product-list"
-import { Separator } from "@/components/ui/separator"
-import Link from "next/link"
-import { Container } from "@/components/container"
+import { useCartState } from "@/lib/states/shopping-car";
+import { CheckoutForm } from "./checkout-form";
+import { OrderSummary } from "./order-summary";
+import { ProductList } from "./product-list";
+import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
+import { Container } from "@/components/container";
 
 export default function Summary() {
-  const { cartItems, totalPrice } = useCartState()
+  const { cartItems, totalPrice, replaceCart } = useCartState();
 
   if (cartItems.length === 0) {
     return (
@@ -27,13 +28,13 @@ export default function Summary() {
           Ir a la tienda
         </Link>
       </Container>
-    )
+    );
   }
 
   return (
     <Container className="pb-20">
       <h1 className="text-2xl md:text-3xl font-bold mb-8 text-center">
-        Resumen de Compra
+        Resumen de tu solicitud
       </h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-8">
@@ -48,7 +49,9 @@ export default function Summary() {
 
         <div className="order-1 lg:order-2 flex flex-col gap-12">
           <div>
-            <h2 className="text-xl font-semibold mb-4">Resumen del Pedido</h2>
+            <h2 className="text-xl font-semibold mb-4">
+              Resumen de la solicitud
+            </h2>
             <OrderSummary
               subtotal={totalPrice}
               shipping={0}
@@ -61,9 +64,22 @@ export default function Summary() {
           <div>
             <h2 className="text-xl font-semibold mb-4">Datos de Contacto</h2>
             <CheckoutForm />
+            <div className="mt-4">
+              <QuotedWhatsApp
+                items={cartItems.map(
+                  ({ _id, selectedSize, qty, finalPrice }) => ({
+                    _id,
+                    selectedSize,
+                    qty,
+                    finalPrice,
+                  }),
+                )}
+                onQuoted={replaceCart}
+              />
+            </div>
           </div>
         </div>
       </div>
     </Container>
-  )
+  );
 }

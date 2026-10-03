@@ -1,15 +1,15 @@
-import { getAllPeluches } from "@/lib/actions/product"
-import Link from "next/link"
-import { ProductCard } from "../product-card"
-import { buttonVariants } from "../ui/button"
-import { ScrollArea, ScrollBar } from "../ui/scroll-area"
+import { getAllPeluches } from "@/lib/actions/product";
+import Link from "next/link";
+import { ProductCard } from "../product-card";
+import { buttonVariants } from "../ui/button";
+import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 
 export async function FeaturedProducts() {
-  const { products } = await getAllPeluches({ isFeatured: true, pageSize: 8 })
+  const { products } = await getAllPeluches({ isFeatured: true, pageSize: 8 });
 
   // Si no hay productos destacados, no renderizamos la sección completa
   // (ni el título "Productos destacados" ni el enlace "Ver más").
-  if (products.length === 0) return null
+  if (products.length === 0) return null;
 
   return (
     <section className="flex flex-col space-y-2">
@@ -27,11 +27,11 @@ export async function FeaturedProducts() {
       <ScrollArea className="whitespace-nowrap">
         <div className="flex w-max space-x-8 pb-4 pl-4">
           {products.map((product) => (
-            <ProductCard key={product._id} {...product} />
+            <ProductCard key={product.id} {...product} />
           ))}
         </div>
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
     </section>
-  )
+  );
 }

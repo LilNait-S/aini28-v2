@@ -1,24 +1,25 @@
-import { Toaster } from "@/components/ui/sonner"
-import { OrganizationSchema } from "@/components/seo/organization-schema"
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
-import localFont from "next/font/local"
-import { NuqsAdapter } from "nuqs/adapters/next/app"
-import "./globals.css"
+import { Toaster } from "@/components/ui/sonner";
+import { CatalogRefresh } from "@/components/catalog-refresh";
+import { OrganizationSchema } from "@/components/seo/organization-schema";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import localFont from "next/font/local";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"] });
 
 const bento = localFont({
   src: "./fonts/Bento.woff2",
   variable: "--font-bento",
   weight: "400",
-})
+});
 
 const nexus = localFont({
   src: "./fonts/Nexusbold-regular.woff2",
   variable: "--font-nexus",
   weight: "400",
-})
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://aini28.com"),
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
     template: "%s | Aini28",
   },
   description:
-    "Descubre peluches adorables y de alta calidad en Aini28. Material antialérgico, envío gratis en Lima. ¡Encuentra el regalo perfecto!",
+    "Descubre peluches adorables y de alta calidad en Aini28. Material antialérgico. Coordina tu compra por correo o WhatsApp. ¡Encuentra el regalo perfecto!",
   keywords: [
     "peluches Peru",
     "juguetes Lima",
@@ -57,32 +58,26 @@ export const metadata: Metadata = {
     url: "https://aini28.com",
     siteName: "Aini28",
     title: "Aini28 - Tienda de Peluches de Calidad",
-    description:
-      "Peluches adorables y de alta calidad con envío gratis en Lima",
+    description: "Peluches adorables y de alta calidad en Perú",
   },
 
   twitter: {
     card: "summary_large_image",
     title: "Aini28 - Tienda de Peluches",
-    description: "Peluches de calidad con envío gratis en Lima",
-    creator: "@aini28_peru",
+    description: "Peluches de calidad en Perú",
   },
-
-  verification: {
-    // google: 'tu-codigo-verificacion-aqui',
-  },
-}
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html lang="es">
       <head>
         {/* Preconnect para recursos externos */}
-        <link rel="preconnect" href="https://cdn.sanity.io" />
+        <link rel="preconnect" href="https://api.aini28.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
@@ -105,10 +100,11 @@ export default function RootLayout({
       >
         <OrganizationSchema />
         <NuqsAdapter>
+          <CatalogRefresh />
           {children}
           <Toaster richColors toastOptions={{}} closeButton theme="light" />
         </NuqsAdapter>
       </body>
     </html>
-  )
+  );
 }

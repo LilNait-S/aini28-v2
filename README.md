@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Aini28 public catalog
 
-## Getting Started
+Next.js website backed by Plush public catalog APIs. Products, publication,
+variants, normal/live offer prices and banners are managed at
+https://app.aini28.com/website. The former /studio URL redirects there.
 
-First, run the development server:
+The website is a catalog: it does not expose stock, reserve products or create
+sales. Email and WhatsApp send inquiries; a seller records the sale manually.
+Current public variants/prices are revalidated before preparing/sending an inquiry.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Local development
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Use Node 22+ and npm. Run npm ci, then
+node node_modules/next/dist/bin/next dev --port 3002.
+Use NEXT_PUBLIC_SITE_URL=http://localhost:3002 for that local process.
+Plush system development uses ports 5173/3000 independently.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+PLUSH_API_URL is server-only and defaults to https://api.aini28.com. It must be an
+HTTPS origin in production; local HTTP localhost/127.0.0.1 is allowed during
+development. Catalog API access is public/read-only: no API token or R2 secret.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Email uses the existing FROM_EMAIL_USER_AINI, FROM_EMAIL_PASS_AINI and TO_EMAIL
+server settings. NEXT_PUBLIC_SITE_URL is https://aini28.com in production.
+Keep existing Turnstile and rate-limit settings. Never commit credentials or
+customer data. Sanity settings and tokens are no longer required by the website.
 
-## Learn More
+## Validation and release
 
-To learn more about Next.js, take a look at the following resources:
+npm run test:catalog
+npm run lint
+node node_modules/typescript/bin/tsc --noEmit
+npm run build
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Vercel is connected to the GitHub repository. Review its deployment status before
+checking the public site. Verify published/hidden products, variants, images,
+closed-live offers, inquiry repricing, sitemap and /studio redirect after release.
+Do not use real inquiry delivery as an automated test without authorization.
+See docs/PLUSH_INTEGRATION.md for migration evidence and verification history.

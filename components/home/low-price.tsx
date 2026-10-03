@@ -1,17 +1,17 @@
-import { getAllPeluches } from "@/lib/actions/product"
-import { cn } from "@/lib/utils"
-import { ChevronsRight } from "lucide-react"
-import Link from "next/link"
-import BudgetProductsEmptyState from "../empty/budget-products"
-import { ProductCard } from "../product-card"
-import { buttonVariants } from "../ui/button"
+import { getAllPeluches } from "@/lib/actions/product";
+import { cn } from "@/lib/utils";
+import { ChevronsRight } from "lucide-react";
+import Link from "next/link";
+import BudgetProductsEmptyState from "../empty/budget-products";
+import { ProductCard } from "../product-card";
+import { buttonVariants } from "../ui/button";
 
 export async function LowPrice() {
   const { products } = await getAllPeluches({
     minPrice: 0,
     maxPrice: 50,
     pageSize: 3,
-  })
+  });
 
   return (
     <section className="flex flex-col lg:flex-row gap-4 items-center">
@@ -29,7 +29,7 @@ export async function LowPrice() {
           href={`/peluches?sort=price-asc`}
           className={cn(
             "absolute bottom-8 sm:bottom-12 left-8 sm:left-12 !pl-5 z-20",
-            buttonVariants({ variant: "secondary" })
+            buttonVariants({ variant: "secondary" }),
           )}
         >
           Ver más <ChevronsRight />
@@ -39,11 +39,11 @@ export async function LowPrice() {
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 w-full lg:w-full">
           {products.map((product, index) => (
             <ProductCard
-              key={product._id}
+              key={product.id}
               {...product}
               className={cn(
                 index > 1 && "hidden lg:flex",
-                index > 2 && "lg:hidden"
+                index > 2 && "lg:hidden",
               )}
             />
           ))}
@@ -52,5 +52,5 @@ export async function LowPrice() {
         <BudgetProductsEmptyState />
       )}
     </section>
-  )
+  );
 }

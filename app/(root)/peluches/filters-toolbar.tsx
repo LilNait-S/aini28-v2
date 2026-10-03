@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -9,29 +9,29 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { cn } from "@/lib/utils"
-import { sortFilter, sizes_filters } from "@/constants/sizes"
-import { Package, Tags } from "lucide-react"
-import { parseAsInteger, parseAsString, useQueryState } from "nuqs"
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import { sortFilter, sizeOptions } from "@/constants/sizes";
+import { Package, Tags } from "lucide-react";
+import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 
-export function FiltersToolbar() {
+export function FiltersToolbar({ sizes }: { sizes: string[] }) {
   const [size, setSize] = useQueryState(
     "size",
     parseAsString
       .withOptions({ history: "replace", shallow: false })
-      .withDefault("0")
-  )
+      .withDefault("0"),
+  );
 
   const [filters, setSetfilters] = useQueryState(
     "sort",
-    parseAsString.withOptions({ history: "replace", shallow: false })
-  )
+    parseAsString.withOptions({ history: "replace", shallow: false }),
+  );
 
   const [, setPage] = useQueryState(
     "page",
-    parseAsInteger.withOptions({ history: "replace", shallow: false })
-  )
+    parseAsInteger.withOptions({ history: "replace", shallow: false }),
+  );
 
   return (
     <header className="flex flex-col sm:flex-row sm:space-x-6 space-y-4 sm:space-y-0 items-start sm:items-center">
@@ -40,7 +40,13 @@ export function FiltersToolbar() {
           <Tags />
           <span className="text-sm sm:text-base">Ordenar</span>
         </div>
-        <Select value={filters ?? undefined} onValueChange={setSetfilters}>
+        <Select
+          value={filters ?? undefined}
+          onValueChange={(value) => {
+            setSetfilters(value);
+            setPage(1);
+          }}
+        >
           <SelectTrigger className="w-full sm:w-[200px]">
             <SelectValue placeholder="Selecciona un filtro" />
           </SelectTrigger>
@@ -63,17 +69,22 @@ export function FiltersToolbar() {
         </div>
         <RadioGroup
           className="gap-2 flex flex-wrap w-full"
-          value={size ?? undefined}
+          value={
+            sizeOptions[Number(size) as keyof typeof sizeOptions] ?? size ?? "0"
+          }
           onValueChange={(value: string) => {
-            setSize(value)
-            setPage(1)
+            setSize(value);
+            setPage(1);
           }}
         >
-          {sizes_filters.map(({ id, label }) => (
+          {[
+            { id: "0", label: "Todos" },
+            ...sizes.map((s) => ({ id: s, label: s })),
+          ].map(({ id, label }) => (
             <label
               key={id}
               className={cn(
-                "relative flex w-full sm:w-auto cursor-pointer flex-col items-center gap-3 rounded-full border border-input px-6 py-2 text-center outline-offset-2 transition-colors has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-primary has-[[data-state=checked]]:text-primary-foreground has-[:focus-visible]:outline has-[:focus-visible]:outline-ring/70"
+                "relative flex w-full sm:w-auto cursor-pointer flex-col items-center gap-3 rounded-full border border-input px-6 py-2 text-center outline-offset-2 transition-colors has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-primary has-[[data-state=checked]]:text-primary-foreground has-[:focus-visible]:outline has-[:focus-visible]:outline-ring/70",
               )}
             >
               <RadioGroupItem
@@ -89,5 +100,5 @@ export function FiltersToolbar() {
         </RadioGroup>
       </div>
     </header>
-  )
+  );
 }

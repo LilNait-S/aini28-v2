@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Country, CountryDropdown } from "@/components/ui/country-dropdown"
+import { Button } from "@/components/ui/button";
+import { Country, CountryDropdown } from "@/components/ui/country-dropdown";
 import {
   Form,
   FormControl,
@@ -9,9 +9,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { PhoneInput } from "@/components/ui/phone-input"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { PhoneInput } from "@/components/ui/phone-input";
 import {
   Select,
   SelectContent,
@@ -20,35 +20,35 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
-import { useCartState } from "@/lib/states/shopping-car"
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { useCartState } from "@/lib/states/shopping-car";
 import {
   CustomerContact,
   customerContactSchema,
-} from "@/lib/validations/customer-contact"
-import { useOrder } from "@/services/api/order"
-import { OrderPayload } from "@/types/order"
-import { Turnstile, captchaEnabled } from "@/components/security/turnstile"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { toast } from "sonner"
+} from "@/lib/validations/customer-contact";
+import { useOrder } from "@/services/api/order";
+import { OrderPayload } from "@/types/order";
+import { Turnstile, captchaEnabled } from "@/components/security/turnstile";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import {
   departamentosPeru,
   distritosPorProvincia,
   paymentMethods,
   provinciasLima,
   shippingMethods,
-} from "./checkout-data"
-import { useRouter } from "next/navigation"
+} from "./checkout-data";
+import { useRouter } from "next/navigation";
 
 export function CheckoutForm() {
-  const { cartItems, resetCart } = useCartState()
-  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null)
-  const [captchaToken, setCaptchaToken] = useState("")
-  const { createOrder, loading } = useOrder()
-  const { push } = useRouter()
+  const { cartItems, resetCart } = useCartState();
+  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
+  const [captchaToken, setCaptchaToken] = useState("");
+  const { createOrder, loading } = useOrder();
+  const { push } = useRouter();
   const form = useForm<CustomerContact>({
     resolver: zodResolver(customerContactSchema),
     defaultValues: {
@@ -63,33 +63,32 @@ export function CheckoutForm() {
       district: "",
       address: "",
     },
-  })
+  });
 
   function onSubmit(values: CustomerContact) {
     const orderDetails: OrderPayload = {
       userDetails: values,
       cartItems,
       captchaToken,
-    }
+    };
     createOrder(orderDetails)
       .then(() => {
-        toast.success("Pedido realizado correctamente", {
+        toast.success("Solicitud enviada", {
           description:
-            "Tu pedido ha sido enviado. Pronto recibirás confirmación.",
-        })
-        form.reset()
-        resetCart()
-        push("/checkout/confirmation")
+            "Recibimos tu solicitud. Coordinaremos la venta contigo.",
+        });
+        form.reset();
+        resetCart();
+        push("/checkout/confirmation");
       })
-      .catch(() => {
-        toast.error("Error al enviar pedido", {
-          description:
-            "Ocurrió un error al procesar tu pedido. Intenta nuevamente.",
-        })
-      })
+      .catch((error: Error) => {
+        toast.error("No se envió la solicitud", {
+          description: error.message,
+        });
+      });
   }
 
-  const { watch } = form
+  const { watch } = form;
 
   return (
     <Form {...form}>
@@ -132,13 +131,13 @@ export function CheckoutForm() {
                 <div className="flex items-center w-full">
                   <CountryDropdown
                     onChange={(country) => {
-                      setSelectedCountry(country)
+                      setSelectedCountry(country);
 
-                      const countryCode = country.countryCallingCodes[0]
+                      const countryCode = country.countryCallingCodes[0];
                       const formattedCode = countryCode.startsWith("+")
                         ? countryCode
-                        : `+${countryCode}`
-                      form.setValue("phoneNumber", formattedCode)
+                        : `+${countryCode}`;
+                      form.setValue("phoneNumber", formattedCode);
                     }}
                     defaultValue={selectedCountry?.alpha3}
                     inline
@@ -149,7 +148,7 @@ export function CheckoutForm() {
                     placeholder="Ej: +51987654321"
                     defaultCountry={selectedCountry?.alpha2}
                     onCountryChange={(country) => {
-                      setSelectedCountry(country as Country)
+                      setSelectedCountry(country as Country);
                     }}
                     inline
                   />
@@ -246,9 +245,9 @@ export function CheckoutForm() {
                   <FormLabel htmlFor="department">Departamento</FormLabel>
                   <Select
                     onValueChange={(value) => {
-                      field.onChange(value)
-                      form.setValue("province", "")
-                      form.setValue("district", "")
+                      field.onChange(value);
+                      form.setValue("province", "");
+                      form.setValue("district", "");
                     }}
                     value={field.value}
                   >
@@ -282,8 +281,8 @@ export function CheckoutForm() {
                     <FormLabel htmlFor="province">Provincia</FormLabel>
                     <Select
                       onValueChange={(value) => {
-                        field.onChange(value)
-                        form.setValue("district", "")
+                        field.onChange(value);
+                        form.setValue("district", "");
                       }}
                       value={field.value}
                     >
@@ -333,7 +332,7 @@ export function CheckoutForm() {
                             <SelectLabel>Distritos</SelectLabel>
                             {distritosPorProvincia[
                               watch(
-                                "province"
+                                "province",
                               ) as keyof typeof distritosPorProvincia
                             ].map((distrito) => (
                               <SelectItem key={distrito} value={distrito}>
@@ -379,9 +378,9 @@ export function CheckoutForm() {
         >
           {form.formState.isSubmitting || loading
             ? "Cargando..."
-            : "Confirmar pedido"}
+            : "Enviar solicitud por correo"}
         </Button>
       </form>
     </Form>
-  )
+  );
 }

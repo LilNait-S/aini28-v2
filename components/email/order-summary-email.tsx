@@ -1,4 +1,3 @@
-import { parseSize } from "@/utils/parse-size"
 import {
   Html,
   Head,
@@ -9,29 +8,30 @@ import {
   Text,
   Heading,
   Hr,
-} from "@react-email/components"
+} from "@react-email/components";
 
 interface Props {
-  fullName: string
-  email: string
-  phoneNumber: string
-  total: number
-  paymentMethod: string
-  shippingMethod: string
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  total: number;
+  paymentMethod: string;
+  shippingMethod: string;
   address: {
-    country?: string
-    department?: string
-    province?: string
-    district?: string
-    address?: string
-  }
+    country?: string;
+    department?: string;
+    province?: string;
+    district?: string;
+    address?: string;
+  };
   cartItems: {
-    name: string
-    qty: number
-    finalPrice: number
-    selectedSize: number
-  }[]
-  isForCustomer?: boolean // Nueva propiedad para diferenciar el correo
+    name: string;
+    qty: number;
+    finalPrice: number;
+    selectedSize: string;
+    variantLabel: string;
+  }[];
+  isForCustomer?: boolean; // Nueva propiedad para diferenciar el correo
 }
 
 export default function OrderSummaryEmail({
@@ -50,8 +50,8 @@ export default function OrderSummaryEmail({
       <Head />
       <Preview>
         {isForCustomer
-          ? `Confirmación de tu pedido en Aini28`
-          : `Nuevo pedido recibido de ${fullName}`}
+          ? `Solicitud recibida en Aini28`
+          : `Nueva solicitud de ${fullName}`}
       </Preview>
       <Body
         style={{
@@ -68,21 +68,23 @@ export default function OrderSummaryEmail({
           }}
         >
           <Heading style={{ color: "#333" }}>
-            {isForCustomer
-              ? "🎉 Confirmación de tu pedido"
-              : "🧾 Nuevo pedido recibido"}
+            {isForCustomer ? "Solicitud recibida" : "Nueva solicitud recibida"}
           </Heading>
           {isForCustomer ? (
             <Text>
-              Hola {fullName}, gracias por tu pedido. Aquí tienes un resumen de
-              tu compra:
+              Hola {fullName}, gracias por tu solicitud. Aquí tienes un resumen
+              de los peluches que elegiste:
             </Text>
           ) : (
             <Text>
-              Has recibido un nuevo pedido de <strong>{fullName}</strong>. Aquí
-              tienes los detalles:
+              Has recibido una nueva solicitud de <strong>{fullName}</strong>.
+              Aquí tienes los detalles:
             </Text>
           )}
+          <Text>
+            Esta solicitud no confirma una venta ni reserva productos.
+            Coordinaremos contigo el pago y el envío.
+          </Text>
           <Text>
             <strong>Cliente:</strong> {fullName}
           </Text>
@@ -93,7 +95,7 @@ export default function OrderSummaryEmail({
             <strong>Teléfono:</strong> {phoneNumber}
           </Text>
           <Text>
-            <strong>Total:</strong> S/. {total.toFixed(2)}
+            <strong>Total referencial:</strong> S/. {total.toFixed(2)}
           </Text>
           <Text>
             <strong>Forma de pago:</strong> {paymentMethod}
@@ -108,9 +110,8 @@ export default function OrderSummaryEmail({
           <Section>
             {cartItems.map((item, idx) => (
               <Text key={idx}>
-                {item.name} — Talla: {parseSize(item.selectedSize).label} —
-                Cant: {item.qty} — Subtotal: S/.{" "}
-                {(item.qty * item.finalPrice).toFixed(2)}
+                {item.name} — Talla: {item.variantLabel} — Cant: {item.qty} —
+                Subtotal: S/. {(item.qty * item.finalPrice).toFixed(2)}
               </Text>
             ))}
           </Section>
@@ -147,5 +148,5 @@ export default function OrderSummaryEmail({
         </Container>
       </Body>
     </Html>
-  )
+  );
 }

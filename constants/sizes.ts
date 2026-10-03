@@ -11,12 +11,12 @@ export type SortOption =
   | "name-asc" // A - Z
   | "name-desc" // Z - A
   | "price-asc" // Precio más bajo
-  | "price-desc" // Precio más alto
+  | "price-desc"; // Precio más alto
 
 export const sortFilter = [
   {
     value: "relevance",
-    label: "Relevancia",
+    label: "Destacados",
   },
   {
     value: "name-asc",
@@ -34,7 +34,7 @@ export const sortFilter = [
     value: "price-desc",
     label: "Precio más alto",
   },
-]
+];
 
 export const sizes_filters = [
   {
@@ -57,11 +57,11 @@ export const sizes_filters = [
     id: 4,
     label: "Gigante",
   },
-]
+];
 
 export const sizeOptions = {
   1: "Pequeño",
   2: "Mediano",
   3: "Grande",
   4: "Gigante",
-}
+};

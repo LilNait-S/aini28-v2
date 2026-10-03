@@ -1,0 +1,454 @@
+{
+  "generatedAt": "2026-10-03T00:10:01.022Z",
+  "source": {
+    "project": "bhxkbc7p",
+    "dataset": "production",
+    "plushApi": "https://api.aini28.com"
+  },
+  "scope": "Published Sanity documents versus public Plush catalog. Hidden/inactive Plush products are not observable here. No data imported.",
+  "counts": {
+    "sanityProducts": 16,
+    "plushPublicProducts": 16,
+    "matchedProducts": 16,
+    "unmatchedProducts": 0,
+    "categories": 25
+  },
+  "products": [
+    {
+      "sanityId": "02c61f68-7d88-4b84-9d40-44bb64c26eba",
+      "name": "Miku",
+      "oldPath": "/peluches/miku",
+      "plushProductId": "d365c11a-bf1d-471b-8ae7-aa78ec3c3a04",
+      "status": "matched",
+      "oldFeatured": false,
+      "variants": [
+        {
+          "sanityKey": "834f7320da97",
+          "size": "Mediano",
+          "measurement": "30 cm",
+          "plushVariantId": "97dead5c-8c28-4158-902a-99114d79b7f3",
+          "oldPrice": "50.00",
+          "plushPrice": "50.00",
+          "priceMatches": true
+        }
+      ],
+      "imageCount": 1
+    },
+    {
+      "sanityId": "084d7d44-7058-4296-b26a-e40a46b95cb2",
+      "name": "oso disfraz",
+      "oldPath": "/peluches/oso-disfraz",
+      "plushProductId": "6c950199-4a1c-49b8-9442-fa75fa68741c",
+      "status": "matched",
+      "oldFeatured": false,
+      "variants": [
+        {
+          "sanityKey": "4e4871fddcf2",
+          "size": "Mediano",
+          "measurement": "40 cm",
+          "plushVariantId": "5d23c821-0831-4e2b-b4dd-3c5d579d5690",
+          "oldPrice": "50.00",
+          "plushPrice": "50.00",
+          "priceMatches": true
+        },
+        {
+          "sanityKey": "0d7d9c7925e6",
+          "size": "Grande",
+          "measurement": "60 cm",
+          "plushVariantId": "f12483be-4f48-42c4-aaf2-3b3a95a26142",
+          "oldPrice": "80.00",
+          "plushPrice": "80.00",
+          "priceMatches": true
+        }
+      ],
+      "imageCount": 2
+    },
+    {
+      "sanityId": "0b088360-22c7-4b8a-8406-d9534031d267",
+      "name": "Furia nocturna",
+      "oldPath": "/peluches/furia-nocturna",
+      "plushProductId": "efee81e1-fc51-45a6-9b81-8e3556ff71f4",
+      "status": "matched",
+      "oldFeatured": false,
+      "variants": [
+        {
+          "sanityKey": "778b6cee5ef2",
+          "size": "Pequeño",
+          "measurement": "25 cm",
+          "plushVariantId": "0f407d9d-83f7-4b7c-8207-33a077cef75c",
+          "oldPrice": "35.00",
+          "plushPrice": "35.00",
+          "priceMatches": true
+        },
+        {
+          "sanityKey": "c27d145f1080",
+          "size": "Mediano",
+          "measurement": "40 cm",
+          "plushVariantId": "8e123314-a7f1-4f69-a872-36051a8411b9",
+          "oldPrice": "50.00",
+          "plushPrice": "50.00",
+          "priceMatches": true
+        }
+      ],
+      "imageCount": 1
+    },
+    {
+      "sanityId": "1c01e227-03eb-4b44-8b5d-2257fe7dba25",
+      "name": "Totoro con hoja peludo",
+      "oldPath": "/peluches/totoro-con-hoja-peludo",
+      "plushProductId": "1491a5b2-83af-431e-b43e-2c887413adcd",
+      "status": "matched",
+      "oldFeatured": false,
+      "variants": [
+        {
+          "sanityKey": "e65d442cfac1",
+          "size": "Pequeño",
+          "measurement": "25 cm",
+          "plushVariantId": "1a8b1441-bf92-42c0-aecf-0c4504cf8c85",
+          "oldPrice": "25.00",
+          "plushPrice": "25.00",
+          "priceMatches": true
+        }
+      ],
+      "imageCount": 2
+    },
+    {
+      "sanityId": "66f20a51-4748-48aa-b50f-5783eb455ecb",
+      "name": "Gato Garfield",
+      "oldPath": "/peluches/gato-garfield",
+      "plushProductId": "c0b10974-c60b-41b0-afd1-6853be264e69",
+      "status": "matched",
+      "oldFeatured": false,
+      "variants": [
+        {
+          "sanityKey": "f53fd6639170",
+          "size": "Pequeño",
+          "measurement": "25 cm",
+          "plushVariantId": "1c67eb4f-8b6b-4283-a0fd-2b5ef7fd56b0",
+          "oldPrice": "35.00",
+          "plushPrice": "35.00",
+          "priceMatches": true
+        },
+        {
+          "sanityKey": "3d6dda6fa63a",
+          "size": "Grande",
+          "measurement": "60 cm",
+          "plushVariantId": "c5696ceb-49b8-4e85-9e28-efa48e677f22",
+          "oldPrice": "80.00",
+          "plushPrice": "80.00",
+          "priceMatches": true
+        }
+      ],
+      "imageCount": 1
+    },
+    {
+      "sanityId": "7c20aeca-1e0d-445d-a314-94117026a4a5",
+      "name": "pochaco hamburguesa",
+      "oldPath": "/peluches/pochaco-hamburguesa",
+      "plushProductId": "17ac1139-0382-427d-93ea-044a01b244f7",
+      "status": "matched",
+      "oldFeatured": false,
+      "variants": [
+        {
+          "sanityKey": "7e21f506ac12",
+          "size": "Mediano",
+          "measurement": "40 cm",
+          "plushVariantId": "66dc354a-b96e-4101-817b-74db0c4b7be0",
+          "oldPrice": "50.00",
+          "plushPrice": "50.00",
+          "priceMatches": true
+        },
+        {
+          "sanityKey": "07bca86f6f0b",
+          "size": "Grande",
+          "measurement": "50 cm",
+          "plushVariantId": "9c56958e-0745-4b3b-af2b-b79a57541baf",
+          "oldPrice": "70.00",
+          "plushPrice": "70.00",
+          "priceMatches": true
+        }
+      ],
+      "imageCount": 1
+    },
+    {
+      "sanityId": "7ef8a00a-b36a-4df7-8b0a-e412710ce52d",
+      "name": "Conejo convertible",
+      "oldPath": "/peluches/conejo-convertible",
+      "plushProductId": "34138cd1-28f8-4dac-95d1-331e7ee6ca36",
+      "status": "matched",
+      "oldFeatured": false,
+      "variants": [
+        {
+          "sanityKey": "cec081d3cc78",
+          "size": "Mediano",
+          "measurement": "30 cm",
+          "plushVariantId": "40d5580d-f6a4-48e7-935a-6050f7213f60",
+          "oldPrice": "35.00",
+          "plushPrice": "35.00",
+          "priceMatches": true
+        },
+        {
+          "sanityKey": "a791803b394d",
+          "size": "Grande",
+          "measurement": "40 cm",
+          "plushVariantId": "fc0e5937-3144-4f2d-9368-06b3cf988040",
+          "oldPrice": "55.00",
+          "plushPrice": "55.00",
+          "priceMatches": true
+        }
+      ],
+      "imageCount": 2
+    },
+    {
+      "sanityId": "7f9e920e-f584-4564-8d83-ce2c8b840283",
+      "name": "Gorila",
+      "oldPath": "/peluches/gorila",
+      "plushProductId": "a9f6e0d9-e5f4-4b8a-8784-7fb3284626f2",
+      "status": "matched",
+      "oldFeatured": false,
+      "variants": [
+        {
+          "sanityKey": "273d1905327b",
+          "size": "Grande",
+          "measurement": "40 cm",
+          "plushVariantId": "8d0ac129-e96e-4287-af70-773cfe9a665e",
+          "oldPrice": "50.00",
+          "plushPrice": "50.00",
+          "priceMatches": true
+        },
+        {
+          "sanityKey": "5c35a1c743c7",
+          "size": "Pequeño",
+          "measurement": "25 cm",
+          "plushVariantId": "72b75a4f-da70-4599-a4c8-d398521d3f4a",
+          "oldPrice": "25.00",
+          "plushPrice": "25.00",
+          "priceMatches": true
+        }
+      ],
+      "imageCount": 2
+    },
+    {
+      "sanityId": "8532b28f-f34d-4b59-aebd-cd4904577792",
+      "name": "Minion",
+      "oldPath": "/peluches/minion",
+      "plushProductId": "30af3617-a50f-4b82-9d91-63ebcd67ab4f",
+      "status": "matched",
+      "oldFeatured": false,
+      "variants": [
+        {
+          "sanityKey": "d9bbd4789bad",
+          "size": "Mediano",
+          "measurement": "30 cm",
+          "plushVariantId": "fabce84a-c1f0-482d-a6fe-aeacb6cb4df7",
+          "oldPrice": "45.00",
+          "plushPrice": "45.00",
+          "priceMatches": true
+        }
+      ],
+      "imageCount": 1
+    },
+    {
+      "sanityId": "8d31f5e7-306c-4646-891f-ee4f44e4cfb7",
+      "name": "Sullivan bebe",
+      "oldPath": "/peluches/sullivan-bebe",
+      "plushProductId": "3d1b06b8-76df-43b2-87a0-abf4e6cd7944",
+      "status": "matched",
+      "oldFeatured": false,
+      "variants": [
+        {
+          "sanityKey": "308025b8891e",
+          "size": "Mediano",
+          "measurement": "40 cm",
+          "plushVariantId": "4269df74-f854-4fe2-aa7c-f8ef8722dd9b",
+          "oldPrice": "79.00",
+          "plushPrice": "79.00",
+          "priceMatches": true
+        },
+        {
+          "sanityKey": "be422642fa73",
+          "size": "Grande",
+          "measurement": "55 cm",
+          "plushVariantId": "b5802c5c-5b09-4d36-a7bb-375f6aefaeeb",
+          "oldPrice": "99.00",
+          "plushPrice": "99.00",
+          "priceMatches": true
+        }
+      ],
+      "imageCount": 1
+    },
+    {
+      "sanityId": "b7f09bfd-f1d4-4620-8793-5422d0d05344",
+      "name": "Gato Pusheen",
+      "oldPath": "/peluches/gato-pusheen",
+      "plushProductId": "f34ea5d0-677d-41db-ad07-ff9769ba0c89",
+      "status": "matched",
+      "oldFeatured": false,
+      "variants": [
+        {
+          "sanityKey": "d804cb0dd6d3",
+          "size": "Mediano",
+          "measurement": "30 cm",
+          "plushVariantId": "654aca46-8147-4f2a-b270-fd09ba578cff",
+          "oldPrice": "40.00",
+          "plushPrice": "40.00",
+          "priceMatches": true
+        }
+      ],
+      "imageCount": 2
+    },
+    {
+      "sanityId": "c1cf43f2-5fc7-4edf-92d2-b7d041406c04",
+      "name": "Coyote y correcaminos",
+      "oldPath": "/peluches/coyote-y-correcaminos",
+      "plushProductId": "2eecb582-5c14-4eff-a8ee-e970a57c4434",
+      "status": "matched",
+      "oldFeatured": false,
+      "variants": [
+        {
+          "sanityKey": "15eef00375d9",
+          "size": "Mediano",
+          "measurement": "40 cm",
+          "plushVariantId": "17fbb3fc-d98e-4483-8eab-17678195fc6d",
+          "oldPrice": "50.00",
+          "plushPrice": "50.00",
+          "priceMatches": true
+        }
+      ],
+      "imageCount": 1
+    },
+    {
+      "sanityId": "d7d8bbef-71a3-45f9-b59b-5baa62b9ddeb",
+      "name": "Pikachu",
+      "oldPath": "/peluches/pikachu",
+      "plushProductId": "d506cb38-36cc-4a6a-8867-d4a7c96a1a7e",
+      "status": "matched",
+      "oldFeatured": false,
+      "variants": [
+        {
+          "sanityKey": "c85752102c26",
+          "size": "Mediano",
+          "measurement": "30 cm",
+          "plushVariantId": "8b632bfa-fb1d-486b-b78e-3a0ad80ab9fc",
+          "oldPrice": "45.00",
+          "plushPrice": "45.00",
+          "priceMatches": true
+        },
+        {
+          "sanityKey": "32d281304b85",
+          "size": "Grande",
+          "measurement": "50 cm",
+          "plushVariantId": "cd89b517-2e91-4c11-bed7-5b1b1c863518",
+          "oldPrice": "80.00",
+          "plushPrice": "80.00",
+          "priceMatches": true
+        }
+      ],
+      "imageCount": 1
+    },
+    {
+      "sanityId": "e2d100c8-5392-4401-90ca-985f409cc657",
+      "name": "Perro znauser",
+      "oldPath": "/peluches/perro-znauser",
+      "plushProductId": "a8294ba3-b317-4d97-b0c3-06e714ae016d",
+      "status": "matched",
+      "oldFeatured": false,
+      "variants": [
+        {
+          "sanityKey": "cd29b067c5af",
+          "size": "Grande",
+          "measurement": "30 cm",
+          "plushVariantId": "69bdd0ef-4837-46b7-b46e-e7397b560b99",
+          "oldPrice": "40.00",
+          "plushPrice": "40.00",
+          "priceMatches": true
+        }
+      ],
+      "imageCount": 1
+    },
+    {
+      "sanityId": "e6f315f9-bb0e-475d-93a7-3ecc099730ee",
+      "name": "gengar",
+      "oldPath": "/peluches/gengar",
+      "plushProductId": "c57d5d5f-047f-4746-9aad-2edd15ea16d2",
+      "status": "matched",
+      "oldFeatured": false,
+      "variants": [
+        {
+          "sanityKey": "4efa331248ee",
+          "size": "Grande",
+          "measurement": "45 cm",
+          "plushVariantId": "b2a45fd6-fa10-4fc1-83ee-90485f949376",
+          "oldPrice": "80.00",
+          "plushPrice": "80.00",
+          "priceMatches": true
+        }
+      ],
+      "imageCount": 1
+    },
+    {
+      "sanityId": "ece4b227-7c39-41fd-ba9c-c634ca45c3cd",
+      "name": "Pollo antena",
+      "oldPath": "/peluches/pollo-antena",
+      "plushProductId": "adbf0b26-750b-4f33-9a55-748cfed2e19a",
+      "status": "matched",
+      "oldFeatured": false,
+      "variants": [
+        {
+          "sanityKey": "2a386aa3ab07",
+          "size": "Pequeño",
+          "measurement": "25 cm",
+          "plushVariantId": "b674248b-c878-4a21-a25b-5256a6f6e8ff",
+          "oldPrice": "25.00",
+          "plushPrice": "25.00",
+          "priceMatches": true
+        }
+      ],
+      "imageCount": 1
+    }
+  ],
+  "banners": [
+    {
+      "sanityId": "67f8f030-8ec0-405a-9e08-5aae49e470bc",
+      "title": "pushen",
+      "alt": "pushen",
+      "active": true,
+      "oldOrder": null,
+      "proposedOrder": 0,
+      "oldLink": "https://aini28-v2.vercel.app/peluches/gato-pusheen",
+      "proposedLink": "/peluches/gato-pusheen",
+      "targetInPublicPlush": true,
+      "width": 1320,
+      "height": 1319,
+      "assetRef": "image-da4b7c529d5be17f88b6ac52c092b99cbc3b7e46-1320x1319-webp"
+    },
+    {
+      "sanityId": "b1561782-5038-42b4-af21-23910ceafb86",
+      "title": "Furia nocturna chimuelo",
+      "alt": "chimuelo",
+      "active": true,
+      "oldOrder": null,
+      "proposedOrder": 1,
+      "oldLink": "https://aini28-v2.vercel.app/peluches/furia-nocturna",
+      "proposedLink": "/peluches/furia-nocturna",
+      "targetInPublicPlush": true,
+      "width": 800,
+      "height": 800,
+      "assetRef": "image-c322e4bd9357b370609c7706a84e579e24a6d9c0-800x800-webp"
+    },
+    {
+      "sanityId": "f5c7904a-c47a-43d0-94ac-34bc3c8d94cd",
+      "title": "Coyote y Correcamino",
+      "alt": "coyote",
+      "active": true,
+      "oldOrder": null,
+      "proposedOrder": 2,
+      "oldLink": "https://aini28-v2.vercel.app/peluches/coyote-y-correcaminos",
+      "proposedLink": "/peluches/coyote-y-correcaminos",
+      "targetInPublicPlush": true,
+      "width": 675,
+      "height": 772,
+      "assetRef": "image-00f08b0c8679ee8545e11e2c3e3d4f8693c54272-675x772-webp"
+    }
+  ]
+}
