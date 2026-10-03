@@ -1,5 +1,5 @@
-import { z } from "zod"
-import { customerContactSchema } from "./customer-contact"
+import { z } from "zod";
+import { customerContactSchema } from "./customer-contact";
 
 /**
  * Esquema de un ítem del carrito tal como lo consume el endpoint de correo.
@@ -8,20 +8,21 @@ import { customerContactSchema } from "./customer-contact"
  */
 export const cartItemSchema = z
   .object({
-    _id: z.string().optional(),
+    _id: z.string().uuid(),
     name: z.string().min(1).max(300),
     qty: z.number().int().positive().max(1000),
     price: z.number().nonnegative().optional(),
     salePrice: z.number().nonnegative().optional(),
     finalPrice: z.number().nonnegative(),
-    selectedSize: z.number(),
+    selectedSize: z.string().uuid(),
+    variantLabel: z.string().min(1).max(1000),
     slug: z.string().optional(),
   })
-  .passthrough()
+  .passthrough();
 
 export const orderPayloadSchema = z.object({
   userDetails: customerContactSchema,
   cartItems: z.array(cartItemSchema).min(1).max(200),
-})
+});
 
-export type OrderPayloadInput = z.infer<typeof orderPayloadSchema>
+export type OrderPayloadInput = z.infer<typeof orderPayloadSchema>;

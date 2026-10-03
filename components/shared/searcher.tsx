@@ -1,176 +1,119 @@
-"use client"
-
-import { useDebounce } from "@/hooks/use-debounce"
-import { getAllPeluches } from "@/lib/actions/product"
-import { urlFor } from "@/sanity/lib/image"
-import { Product } from "@/sanity/types"
-import { Search } from "lucide-react"
-import Link from "next/link"
-import { useEffect, useRef, useState } from "react"
-import { Button } from "../ui/button"
-import { ScrollArea } from "../ui/scroll-area"
-import { LoadingSpinner } from "../ui/loading-spinner"
-import { cn } from "@/lib/utils"
-
+"use client";
+import { useDebounce } from "@/hooks/use-debounce";
+import { getAllPeluches } from "@/lib/actions/product";
+import type { Product } from "@/types/catalog";
+import { Search } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { Button } from "../ui/button";
+import { ScrollArea } from "../ui/scroll-area";
+import { LoadingSpinner } from "../ui/loading-spinner";
 export function Searcher() {
-  const [isExpanded, setIsExpanded] = useState(false)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [searchResults, setSearchResults] = useState<Product[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const searchContainerRef = useRef<HTMLDivElement>(null)
-
-  const debouncedSearchTerm = useDebounce(searchTerm, 500)
-
-  const handleSearchClick = () => {
-    setIsExpanded(true)
-    setTimeout(() => {
-      inputRef.current?.focus()
-    }, 300)
-  }
-
-  const handleSearch = async (term: string) => {
-    if (term.trim() === "") {
-      setSearchResults([])
-      setIsLoading(false)
-      return
+  const [expanded, setExpanded] = useState(false);
+  const [term, setTerm] = useState("");
+  const [results, setResults] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+  const input = useRef<HTMLInputElement>(null);
+  const container = useRef<HTMLDivElement>(null);
+  const debounced = useDebounce(term, 500);
+  useEffect(() => {
+    let current = true;
+    if (!expanded || !debounced.trim() || term !== debounced) {
+      setResults([]);
+      setLoading(false);
+      return () => {
+        current = false;
+      };
     }
-
-    setIsLoading(true)
-
-    try {
-      const results = await getAllPeluches({
-        search: `*${term}*`,
-        pageSize: 10,
+    setLoading(true);
+    getAllPeluches({ search: debounced.trim(), pageSize: 10 })
+      .then(({ products }) => {
+        if (current) setResults(products);
       })
-
-      setSearchResults(results.products)
-    } catch (error) {
-      console.error("Error fetching search results:", error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    if (debouncedSearchTerm) {
-      handleSearch(debouncedSearchTerm)
-    }
-  }, [debouncedSearchTerm])
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        searchContainerRef.current &&
-        !searchContainerRef.current.contains(event.target as Node) &&
-        isExpanded
-      ) {
-        setIsExpanded(false)
-        setSearchResults([])
-        setSearchTerm("")
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside)
+      .catch(() => {
+        if (current) setResults([]);
+      })
+      .finally(() => {
+        if (current) setLoading(false);
+      });
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [isExpanded])
-
+      current = false;
+    };
+  }, [term, debounced, expanded]);
+  useEffect(() => {
+    const dismiss = (event: MouseEvent) => {
+      if (!container.current?.contains(event.target as Node)) {
+        setExpanded(false);
+        setTerm("");
+        setResults([]);
+      }
+    };
+    document.addEventListener("mousedown", dismiss);
+    return () => document.removeEventListener("mousedown", dismiss);
+  }, []);
   return (
-    <div className="relative" ref={searchContainerRef}>
-      <div className="flex items-center">
-        <div
-          className={`flex items-center bg-border/50 rounded-full overflow-hidden transition-all duration-300 ${
-            isExpanded ? "w-44 md:w-64" : "w-10"
-          }`}
+    <div className="relative" ref={container}>
+      <div className="flex items-center bg-border/50 rounded-full overflow-hidden">
+        <Button
+          type="button"
+          onClick={() => {
+            setExpanded(true);
+            input.current?.focus();
+          }}
+          className="p-2 bg-gray-900 hover:bg-gray-900/80 rounded-full"
+          aria-label="Buscar"
         >
-          <Button
-            type="button"
-            onClick={handleSearchClick}
-            className="p-2 focus:outline-none bg-gray-900 hover:bg-gray-900/80 rounded-full"
-            aria-label="Search"
-          >
-            <Search size={20} />
-          </Button>
-
-          <input
-            ref={inputRef}
-            type="text"
-            placeholder="Unicornio, oso, doraemon..."
-            className={`outline-none px-2 py-1 w-full transition-all text-sm ${
-              isExpanded ? "opacity-100" : "opacity-0 w-0"
-            }`}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onFocus={() => setIsExpanded(true)}
-          />
-        </div>
+          <Search size={20} />
+        </Button>
+        <input
+          ref={input}
+          placeholder="Unicornio, oso, doraemon..."
+          aria-label="Buscar peluches"
+          className={
+            expanded
+              ? "outline-none px-2 py-1 w-36 md:w-56 text-sm"
+              : "w-0 opacity-0"
+          }
+          value={term}
+          onFocus={() => setExpanded(true)}
+          onChange={(e) => setTerm(e.target.value)}
+        />
       </div>
-
-      {isLoading && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-md shadow-lg z-50 p-8 text-center">
+      {expanded && loading && (
+        <div className="absolute top-full left-0 mt-1 bg-white border rounded-md z-50 p-8">
           <LoadingSpinner />
         </div>
       )}
-
-      {searchResults.length > 0 && isExpanded && !isLoading && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-md shadow-lg z-50">
-          <ScrollArea
-            className={cn("h-fit w-full", searchResults.length > 4 && "h-72")}
-          >
+      {expanded && results.length > 0 && !loading && (
+        <div className="absolute top-full right-0 w-64 max-w-[90vw] mt-1 bg-white border rounded-md z-50">
+          <ScrollArea className="max-h-72">
             <ul>
-              {searchResults.map((product) => (
-                <Link
-                  href={`/peluches/${product.slug?.current}`}
-                  key={product._id}
-                  className="border-b last:border-b-0 cursor-pointer"
-                  onClick={() => {
-                    setIsExpanded(false)
-                    setSearchResults([])
-                    setSearchTerm("")
-                  }}
-                >
-                  <div className="flex items-center w-full p-2 hover:bg-gray-50 text-left">
+              {results.map((p) => (
+                <li key={p.id}>
+                  <Link
+                    href={`/peluches/${p.slug}`}
+                    className="flex items-center p-2 border-b hover:bg-gray-50"
+                    onClick={() => {
+                      setExpanded(false);
+                      setTerm("");
+                      setResults([]);
+                    }}
+                  >
                     <img
-                      src={
-                        product.images?.[0]
-                          ? urlFor(product.images[0])
-                              .width(400)
-                              .height(400)
-                              .url()
-                          : "/placeholder-image.webp"
-                      }
-                      alt={product.images?.[0]?.alt || "Imagen del producto"}
+                      src={p.imageUrl}
+                      alt={p.name}
                       width={50}
                       height={50}
                       className="mr-3 rounded-md"
                     />
-                    <div>
-                      <p className="font-semibold text-sm text-balance">
-                        {product.name}
-                      </p>
-                      {/* <div className="flex gap-1">
-                        {product.sizePricing?.map(({ size, _key }) => {
-                          return (
-                            <Badge
-                              key={_key}
-                              variant="secondary"
-                              className="text-xs py-1 px-4"
-                            >
-                              {parseSize(size).label}
-                            </Badge>
-                          )
-                        })}
-                      </div> */}
-                    </div>
-                  </div>
-                </Link>
+                    <span className="text-sm font-semibold">{p.name}</span>
+                  </Link>
+                </li>
               ))}
             </ul>
           </ScrollArea>
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { Button, buttonVariants } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -9,16 +9,14 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet"
-import { useCartState } from "@/lib/states/shopping-car"
-import { urlFor } from "@/sanity/lib/image"
-import { parseSize } from "@/utils/parse-size"
-import { ChevronDown, ChevronUp, ShoppingBag, Trash2 } from "lucide-react"
-import { Separator } from "../ui/separator"
-import { ScrollArea } from "../ui/scroll-area"
-import { cn } from "@/lib/utils"
-import Link from "next/link"
-import { useState } from "react"
+} from "@/components/ui/sheet";
+import { useCartState } from "@/lib/states/shopping-car";
+import { ChevronDown, ChevronUp, ShoppingBag, Trash2 } from "lucide-react";
+import { Separator } from "../ui/separator";
+import { ScrollArea } from "../ui/scroll-area";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { useState } from "react";
 
 export function Bag() {
   const {
@@ -27,9 +25,9 @@ export function Bag() {
     totalQuantities,
     toggleCartItemQuantity,
     onRemove,
-  } = useCartState()
+  } = useCartState();
 
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -44,10 +42,11 @@ export function Bag() {
       <SheetContent className="gap-0">
         <SheetHeader className="p-6">
           <SheetTitle className="text-2xl font-bold">
-            Resumen de tu Compra
+            Tu selección de peluches
           </SheetTitle>
           <SheetDescription>
-            Estos son los peluches que elegiste. ¿Listo para confirmar?
+            Estos son los peluches que elegiste. Revisa tu selección antes de
+            enviar una solicitud.
           </SheetDescription>
         </SheetHeader>
         <div className="h-full flex justify-center items-center">
@@ -69,10 +68,11 @@ export function Bag() {
                         price,
                         salePrice,
                         finalPrice,
-                        images,
+                        imageUrl,
+                        variantLabel,
                         name,
                       },
-                      i
+                      i,
                     ) => (
                       <div
                         key={`${_id + selectedSize}`}
@@ -80,21 +80,14 @@ export function Bag() {
                           "flex flex-col gap-2 pb-4",
                           cartItems.length > 1 &&
                             i !== cartItems.length - 1 &&
-                            "border-b"
+                            "border-b",
                         )}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-4">
                             <img
-                              src={
-                                images?.[0]
-                                  ? urlFor(images[0])
-                                      .width(400)
-                                      .height(400)
-                                      .url()
-                                  : "/placeholder-image.webp"
-                              }
-                              alt={images?.[0]?.alt || "Imagen del producto"}
+                              src={imageUrl}
+                              alt={name}
                               width={70}
                               height={70}
                               className="rounded-xl object-cover"
@@ -104,7 +97,7 @@ export function Bag() {
                                 {name}
                               </h3>
                               <span className="text-primary">
-                                {parseSize(selectedSize).label}
+                                {variantLabel}
                               </span>
                             </div>
                           </div>
@@ -175,7 +168,7 @@ export function Bag() {
                           </div>
                         </div>
                       </div>
-                    )
+                    ),
                   )}
                 </div>
               </ScrollArea>
@@ -187,7 +180,7 @@ export function Bag() {
                     <span>{totalQuantities}</span>
                   </div>
                   <div className="flex justify-between font-medium">
-                    <span>Precio total</span>
+                    <span>Total referencial</span>
                     <span>S/.{totalPrice.toFixed(2)}</span>
                   </div>
                   <Link
@@ -196,7 +189,7 @@ export function Bag() {
                     onClick={() => setOpen(false)}
                     aria-label="Proceed to checkout"
                   >
-                    Finalizar compra
+                    Revisar solicitud
                   </Link>
                 </SheetFooter>
               </div>
@@ -205,5 +198,5 @@ export function Bag() {
         </div>
       </SheetContent>
     </Sheet>
-  )
+  );
 }

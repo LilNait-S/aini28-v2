@@ -9,10 +9,12 @@ import { EmptyView } from "./empty-peluches"
 
 interface PeluchesQueryContainerProps {
   peluchesPromise: ReturnType<typeof getAllPeluches>
+  preferredSize?: string
 }
 
 export function PeluchesQueryContainer({
   peluchesPromise,
+  preferredSize,
 }: PeluchesQueryContainerProps) {
   const { products, totalPages } = use(peluchesPromise)
   const [currentPage, setCurrentPage] = useQueryState(
@@ -34,7 +36,7 @@ export function PeluchesQueryContainer({
 
   return (
     <div className="flex flex-col space-y-12">
-      <PeluchesContainer peluches={products} />
+      <PeluchesContainer peluches={products} preferredSize={preferredSize} />
       <PaginationContainer
         totalPages={totalPages}
         currentPage={currentPage}

@@ -1,9 +1,8 @@
-import { ProductCart } from "@/lib/states/shopping-car"
-import { urlFor } from "@/sanity/lib/image"
-import Link from "next/link"
+import { ProductCart } from "@/lib/states/shopping-car";
+import Link from "next/link";
 
 interface ProductListProps {
-  products: ProductCart[]
+  products: ProductCart[];
 }
 
 export function ProductList({ products }: ProductListProps) {
@@ -13,7 +12,8 @@ export function ProductList({ products }: ProductListProps) {
         ({
           _id,
           finalPrice,
-          images,
+          imageUrl,
+          variantLabel,
           name,
           price,
           qty,
@@ -27,12 +27,8 @@ export function ProductList({ products }: ProductListProps) {
               className="flex-shrink-0 mr-4 mb-4 sm:mb-0"
             >
               <img
-                src={
-                  images?.[0]
-                    ? urlFor(images[0]).width(400).height(400).url()
-                    : "/placeholder-image.webp"
-                }
-                alt={images?.[0]?.alt || "Imagen del producto"}
+                src={imageUrl}
+                alt={name}
                 width={150}
                 height={150}
                 className="rounded-xl object-cover"
@@ -40,6 +36,7 @@ export function ProductList({ products }: ProductListProps) {
             </Link>
             <div className="flex-grow">
               <h3 className="text-lg font-semibold">{name}</h3>
+              <p className="text-sm text-muted-foreground">{variantLabel}</p>
               <div className="mt-2 flex flex-col sm:flex-row sm:justify-between">
                 <div className="text-sm text-muted-foreground mb-2 sm:mb-0">
                   <span>Cantidad: {qty}</span>
@@ -76,8 +73,8 @@ export function ProductList({ products }: ProductListProps) {
               </div>
             </div>
           </div>
-        )
+        ),
       )}
     </div>
-  )
+  );
 }

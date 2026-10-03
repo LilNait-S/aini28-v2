@@ -1,31 +1,33 @@
-import { Product } from "@/sanity/types"
-import { create } from "zustand"
-import { persist } from "zustand/middleware"
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export interface ProductCart {
-  _id: string
-  images: Product["images"]
-  name: string
-  qty: number
-  price: number
-  salePrice?: number
-  finalPrice: number
-  selectedSize: number
-  slug: string
+  _id: string;
+  imageUrl: string;
+  variantLabel: string;
+  name: string;
+  qty: number;
+  price: number;
+  salePrice?: number;
+  finalPrice: number;
+  selectedSize: string;
+  slug: string;
 }
 
 type State = {
-  totalPrice: number
-  cartItems: ProductCart[]
-  qty: number
-  showCart: boolean
-  totalQuantities: number
-}
+  totalPrice: number;
+  cartItems: ProductCart[];
+  qty: number;
+  showCart: boolean;
+  totalQuantities: number;
+};
 
 type Action = {
+  replaceCart: (items: ProductCart[]) => void;
   onAddToCart: ({
     _id,
-    images,
+    imageUrl,
+    variantLabel,
     name,
     price,
     salePrice,
@@ -33,39 +35,41 @@ type Action = {
     qty,
     selectedSize,
     slug,
-  }: ProductCart) => void
-  onRemove: (productId: string, selectedSize: number) => void
+  }: ProductCart) => void;
+  onRemove: (productId: string, selectedSize: string) => void;
   toggleCartItemQuantity: ({
     _id,
     selectedSize,
     value,
   }: {
-    _id: string
-    selectedSize: number
-    value: "inc" | "dec"
-  }) => void
-  incQty: () => void
-  decQty: () => void
-  resetCart: () => void
-}
+    _id: string;
+    selectedSize: string;
+    value: "inc" | "dec";
+  }) => void;
+  incQty: () => void;
+  decQty: () => void;
+  resetCart: () => void;
+};
 
 const calculateTotals = (items: ProductCart[]) => {
   const totalPrice = items.reduce(
     (acc, item) => acc + item.finalPrice * item.qty,
-    0
-  )
-  const totalQuantities = items.reduce((acc, item) => acc + item.qty, 0)
-  return { totalPrice, totalQuantities }
-}
+    0,
+  );
+  const totalQuantities = items.reduce((acc, item) => acc + item.qty, 0);
+  return { totalPrice, totalQuantities };
+};
 
 export const useCartState = create(
-  persist<State & Action>(
+  persist<State & Action, [], [], State>(
     (set, get) => ({
       totalPrice: 0,
       cartItems: [],
       qty: 1,
       showCart: false,
       totalQuantities: 0,
+      replaceCart: (items) =>
+        set({ cartItems: items, ...calculateTotals(items) }),
 
       onAddToCart: ({
         _id,
@@ -74,32 +78,41 @@ export const useCartState = create(
         finalPrice,
         qty,
         selectedSize,
-        images,
+        imageUrl,
+        variantLabel,
         name,
         slug,
       }) => {
-        const { cartItems } = get()
+        const { cartItems } = get();
 
         const existingProductIndex = cartItems.findIndex(
-          (item) => item._id === _id && item.selectedSize === selectedSize
-        )
+          (item) => item._id === _id && item.selectedSize === selectedSize,
+        );
 
-        const existingProduct = cartItems[existingProductIndex]
+        const existingProduct = cartItems[existingProductIndex];
 
-        let updatedCartItems
+        let updatedCartItems;
 
         if (existingProduct) {
-          updatedCartItems = [...cartItems]
+          updatedCartItems = [...cartItems];
           updatedCartItems[existingProductIndex] = {
             ...existingProduct,
+            price,
+            salePrice,
+            finalPrice,
+            imageUrl,
+            variantLabel,
+            name,
+            slug,
             qty: existingProduct.qty + qty,
-          }
+          };
         } else {
           updatedCartItems = [
             ...cartItems,
             {
               _id,
-              images,
+              imageUrl,
+              variantLabel,
               name,
               price,
               salePrice,
@@ -108,66 +121,66 @@ export const useCartState = create(
               selectedSize,
               slug,
             },
-          ]
+          ];
         }
 
         const { totalPrice, totalQuantities } =
-          calculateTotals(updatedCartItems)
+          calculateTotals(updatedCartItems);
 
         set({
           cartItems: updatedCartItems,
           totalPrice,
           totalQuantities,
-        })
+        });
       },
 
       onRemove: (productId, selectedSize) => {
-        const { cartItems } = get()
+        const { cartItems } = get();
         const updatedCartItems = cartItems.filter(
           (item) =>
-            !(item._id === productId && item.selectedSize === selectedSize)
-        )
+            !(item._id === productId && item.selectedSize === selectedSize),
+        );
 
         const { totalPrice, totalQuantities } =
-          calculateTotals(updatedCartItems)
+          calculateTotals(updatedCartItems);
 
         set({
           cartItems: updatedCartItems,
           totalPrice,
           totalQuantities,
-        })
+        });
       },
 
       toggleCartItemQuantity: ({ _id, selectedSize, value }) => {
-        const { cartItems } = get()
+        const { cartItems } = get();
         const index = cartItems.findIndex(
-          (item) => item._id === _id && item.selectedSize === selectedSize
-        )
-        const product = cartItems[index]
-        if (!product) return
+          (item) => item._id === _id && item.selectedSize === selectedSize,
+        );
+        const product = cartItems[index];
+        if (!product) return;
 
-        const updatedCartItems = [...cartItems]
+        const updatedCartItems = [...cartItems];
 
         if (value === "inc") {
           updatedCartItems[index] = {
             ...product,
             qty: product.qty + 1,
-          }
+          };
         } else if (value === "dec" && product.qty > 1) {
           updatedCartItems[index] = {
             ...product,
             qty: product.qty - 1,
-          }
+          };
         }
 
         const { totalPrice, totalQuantities } =
-          calculateTotals(updatedCartItems)
+          calculateTotals(updatedCartItems);
 
         set({
           cartItems: updatedCartItems,
           totalPrice,
           totalQuantities,
-        })
+        });
       },
 
       incQty: () => set((state) => ({ qty: state.qty + 1 })),
@@ -182,11 +195,26 @@ export const useCartState = create(
           cartItems: [],
           totalPrice: 0,
           totalQuantities: 0,
-        })
+        });
       },
     }),
     {
       name: "cart-storage",
-    }
-  )
-)
+      version: 1,
+      partialize: ({
+        cartItems,
+        totalPrice,
+        totalQuantities,
+        qty,
+        showCart,
+      }) => ({ cartItems, totalPrice, totalQuantities, qty, showCart }),
+      migrate: () => ({
+        cartItems: [],
+        totalPrice: 0,
+        totalQuantities: 0,
+        qty: 1,
+        showCart: false,
+      }),
+    },
+  ),
+);

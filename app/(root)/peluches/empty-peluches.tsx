@@ -1,4 +1,4 @@
-import { Package } from "lucide-react"
+import { Package } from "lucide-react";
 
 export function EmptyView() {
   return (
@@ -8,12 +8,12 @@ export function EmptyView() {
       </div>
 
       <h2 className="text-xl font-semibold text-gray-900 mb-2">
-        No hay peluches disponibles
+        No encontramos peluches
       </h2>
 
       <p className="text-gray-500 mb-6 max-w-sm">
-        No se encontraron items en este momento
+        Prueba con otros filtros o vuelve más tarde.
       </p>
     </div>
-  )
+  );
 }

@@ -1,223 +1,117 @@
-"use client"
-
-import { TypographyMuted } from "@/components/typography-muted"
-import { TypographyP } from "@/components/typography-p"
-import { Button } from "@/components/ui/button"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Separator } from "@/components/ui/separator"
-import { COMPANY } from "@/constants/phone-company"
-import { allSizes } from "@/constants/sizes"
-import { useCartState } from "@/lib/states/shopping-car"
-import { cn } from "@/lib/utils"
-import { Product } from "@/sanity/types"
-import {
-  ChevronDown,
-  ChevronUp,
-  MessageCircle,
-  Repeat,
-  ShoppingCart,
-} from "lucide-react"
-import { parseAsString, useQueryState } from "nuqs"
-import { useState } from "react"
-import { toast } from "sonner"
+"use client";
+import { TypographyP } from "@/components/typography-p";
+import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { sizeOptions } from "@/constants/sizes";
+import { QuotedWhatsApp } from "@/components/quoted-whatsapp";
+import { useCartState } from "@/lib/states/shopping-car";
+import { type Product, variantLabel, effectivePrice } from "@/types/catalog";
+import { ChevronDown, ChevronUp, ShoppingCart } from "lucide-react";
+import { parseAsString, useQueryState } from "nuqs";
+import { toast } from "sonner";
 
 export function PelucheClient({
   peluche,
   slug,
 }: {
-  peluche: Product
-  slug: string
+  peluche: Product;
+  slug: string;
 }) {
-  const { sizePricing } = peluche
-
-  const [size, setSize] = useQueryState(
-    "size",
-    parseAsString
-      .withOptions({ history: "replace" })
-      .withDefault(
-        sizePricing?.find((s) => s.isActive)?.size?.toString() ?? "1"
-      )
-  )
-
-  const [price, setPrice] = useState<number | undefined>(
-    sizePricing?.find((s) => s.size === Number(size))?.price
-  )
-
-  const [salePrice, setSalePrice] = useState<number | undefined>(
-    sizePricing?.find((s) => s.size === Number(size))?.salePrice
-  )
-
-  const [approximateSize, setApproximateSize] = useState(
-    `${sizePricing?.find((s) => s.size === Number(size))?.approximateSize} ${
-      sizePricing?.find((s) => s.size === Number(size))?.unit
-    }`
-  )
-
-  const { onAddToCart, qty, decQty, incQty } = useCartState()
-
-  function sendMessage({ name, slug }: { name?: string; slug: string }) {
-    const mensaje =
-      `Hola! Tengo algunas preguntas sobre este producto:\n\n` +
-      `Nombre del producto: ${name}\n` +
-      `Enlace al producto: ${window.location.origin}/peluches/${slug}\n\n` +
-      `¿Podrían ayudarme con más información?`
-
-    const url = `https://wa.me/${COMPANY.phoneNumber}?text=${encodeURIComponent(mensaje)}`
-
-    // Redirigir al usuario a WhatsApp
-    window.open(url, "_blank")
-  }
-
+  const [variantId, setVariantId] = useQueryState(
+    "variant",
+    parseAsString.withOptions({ history: "replace" }),
+  );
+  const [legacySize] = useQueryState("size", parseAsString);
+  const variant =
+    peluche.variants.find((v) => v.id === variantId) ??
+    peluche.variants.find(
+      (v) =>
+        v.attributes["Tamaño"] ===
+        sizeOptions[Number(legacySize) as keyof typeof sizeOptions],
+    ) ??
+    peluche.variants[0];
+  const price = effectivePrice(variant);
+  const { onAddToCart, qty, decQty, incQty } = useCartState();
   return (
     <>
-      <div className="flex items-start space-x-2">
-        <span className="text-5xl font-bold">
-          S/.{salePrice ? salePrice.toFixed(2) : price?.toFixed(2)}
+      <div className="flex flex-wrap items-baseline gap-3">
+        <span className="text-4xl sm:text-5xl font-bold">
+          S/.{price.toFixed(2)}
         </span>
-        {salePrice && (
-          <div className="flex space-x-1 items-center">
-            <span className="line-through text-muted-foreground">
-              S/.{price?.toFixed(2)}
-            </span>
-            <p className="text-muted-foreground">Antes</p>
-          </div>
+        {price < Number(variant.normalPrice) && (
+          <span className="line-through text-muted-foreground">
+            S/.{Number(variant.normalPrice).toFixed(2)}
+          </span>
         )}
       </div>
-      <TypographyP text="Nuestros peluches son importados de calidad antialérgica y rellenos de napa siliconada para mantener esa esponjosidad única." />
-      <div className="flex flex-col space-y-2">
-        <TypographyMuted text={`Tamaño aproximado: ${approximateSize}`} />
-        <RadioGroup
-          className="gap-2 flex"
-          value={size ?? undefined}
-          onValueChange={(value: string) => setSize(value)}
-        >
-          {allSizes.map(({ size: staticSize, label }) => {
-            const matchingSize = sizePricing?.find((s) => s.size === staticSize)
-            const isActive = matchingSize?.isActive ?? false
-            const price = matchingSize?.price ?? null
-            const approximateSize = matchingSize?.approximateSize ?? null
-            const unit = matchingSize?.unit ?? ""
-            const salePrice = sizePricing?.find(
-              (s) => s.size === staticSize
-            )?.salePrice
-
-            return (
-              <label
-                key={staticSize}
-                className={cn(
-                  "relative flex w-full cursor-pointer flex-col items-center gap-3 rounded-full border border-input px-2 py-3 text-center outline-offset-2 transition-colors",
-                  isActive
-                    ? "has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-primary has-[[data-state=checked]]:text-primary-foreground has-[:focus-visible]:outline has-[:focus-visible]:outline-ring/70"
-                    : "pointer-events-none opacity-30"
-                )}
-                onClick={() => {
-                  if (isActive) {
-                    setPrice(price ?? undefined)
-                    setApproximateSize(`${approximateSize} ${unit}`)
-                    setSalePrice(salePrice ?? undefined)
-                  }
-                }}
-              >
-                <RadioGroupItem
-                  id={staticSize.toString()}
-                  value={staticSize.toString()}
-                  className="sr-only after:absolute after:inset-0"
-                  disabled={!isActive}
-                />
-                <p className="text-xs font-medium leading-none">{label}</p>
-              </label>
-            )
-          })}
-        </RadioGroup>
-      </div>
-      <div className="flex space-x-2">
-        <div className="inline-flex -space-x-px rounded-full rtl:space-x-reverse">
+      <TypographyP text={peluche.description} />
+      <RadioGroup
+        aria-label="Variante del producto"
+        className="flex flex-wrap gap-2"
+        value={variant.id}
+        onValueChange={(value) => setVariantId(value)}
+      >
+        {peluche.variants.map((v) => (
+          <label
+            key={v.id}
+            className="relative cursor-pointer rounded-full border px-4 py-3 text-center has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-primary has-[[data-state=checked]]:text-primary-foreground"
+          >
+            <RadioGroupItem
+              value={v.id}
+              className="sr-only after:absolute after:inset-0"
+            />
+            {variantLabel(v)}
+          </label>
+        ))}
+      </RadioGroup>
+      <div className="flex gap-2">
+        <div className="inline-flex rounded-full bg-secondary">
           <Button
-            className="rounded-none shadow-none first:rounded-s-full last:rounded-e-full focus-visible:z-10"
             variant="secondary"
             aria-label="Decrease quantity"
             disabled={qty <= 1}
-            onClick={() => decQty()}
+            onClick={decQty}
           >
-            <ChevronDown size={16} strokeWidth={2} aria-hidden="true" />
+            <ChevronDown />
           </Button>
-          <span className="flex items-center bg-secondary w-7 justify-center px-1 text-sm">
-            {qty}
-          </span>
+          <span className="flex items-center px-2">{qty}</span>
           <Button
-            className="rounded-none shadow-none first:rounded-s-full last:rounded-e-full focus-visible:z-10"
             variant="secondary"
             aria-label="Increase quantity"
             disabled={qty >= 50}
-            onClick={() => incQty()}
+            onClick={incQty}
           >
-            <ChevronUp size={16} strokeWidth={2} aria-hidden="true" />
+            <ChevronUp />
           </Button>
         </div>
         <Button
-          type="button"
-          className="shrink-1 w-full"
+          className="flex-1"
           onClick={() => {
-            const selectedSize = sizePricing?.find(
-              (s) => s.size === Number(size)
-            )?.size
-            if (!selectedSize) {
-              toast.error("Por favor, selecciona un tamaño válido.")
-              return
-            }
-
-            if (!price) {
-              toast.error("El precio del producto no es válido.")
-              return
-            }
-
-            const finalPrice = salePrice ?? price
-            if (!finalPrice) {
-              toast.error("El precio del producto no es válido.")
-              return
-            }
-
-            if (qty < 1 || qty > 50) {
-              toast.error("La cantidad debe estar entre 1 y 50.")
-              return
-            }
-
             onAddToCart({
-              _id: peluche._id,
-              images: peluche.images,
-              name: peluche.name ?? "",
+              _id: peluche.id,
+              selectedSize: variant.id,
+              variantLabel: variantLabel(variant),
+              name: peluche.name,
+              imageUrl: peluche.imageUrl,
               qty,
-              selectedSize,
-              price,
-              salePrice,
-              finalPrice,
+              price: Number(variant.normalPrice),
+              salePrice:
+                price < Number(variant.normalPrice) ? price : undefined,
+              finalPrice: price,
               slug,
-            })
-
-            toast.success("Producto agregado al carrito.")
+            });
+            toast.success("Producto agregado al carrito.");
           }}
         >
           <ShoppingCart />
-          Agregar al Carrito
+          Agregar al carrito
         </Button>
       </div>
-      <div className="flex space-x-4">
-        <button
-          className="flex items-center justify-center gap-1 cursor-pointer w-full"
-          type="button"
-          onClick={() => sendMessage({ name: peluche.name, slug })}
-        >
-          <MessageCircle className="size-3.5 stroke-muted-foreground" />
-          <span className="text-sm text-muted-foreground">Chat</span>
-        </button>
-
-        <Separator orientation="vertical" className="h-5" />
-
-        <button className="flex items-center justify-center gap-1 cursor-pointer w-full">
-          <Repeat className="size-3.5 stroke-muted-foreground" />
-          <span className="text-sm text-muted-foreground">Compartir</span>
-        </button>
-      </div>
+      <QuotedWhatsApp
+        items={[
+          { _id: peluche.id, selectedSize: variant.id, qty, finalPrice: price },
+        ]}
+      />
     </>
-  )
+  );
 }

@@ -1,25 +1,25 @@
-import { ImageResponse } from "next/og"
-import { getPeluche } from "@/lib/actions/product"
+import { ImageResponse } from "next/og";
+import { getPeluche } from "@/lib/actions/product";
 
 export default async function OpengraphImage({
   params,
 }: {
-  params: Promise<{ slug: string }>
+  params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params
+  const { slug } = await params;
 
   try {
-    const peluche = await getPeluche({ slug })
+    const peluche = await getPeluche({ slug });
 
     // Producto eliminado/inexistente → usar la imagen de fallback (catch)
-    if (!peluche) throw new Error(`Product with slug "${slug}" not found.`)
+    if (!peluche) throw new Error(`Product with slug "${slug}" not found.`);
 
-    const firstImageUrl = peluche.images?.[0]?.asset?._ref
-      ? `https://cdn.sanity.io/images/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET}/${peluche.images[0].asset._ref.replace("image-", "").replace("-webp", ".webp").replace("-jpg", ".jpg").replace("-png", ".png")}`
-      : null
-
-    const basePrice = peluche.sizePricing?.find((s) => s.isActive)?.price || 0
-    const salePrice = peluche.sizePricing?.find((s) => s.isActive)?.salePrice
+    const firstImageUrl = peluche.imageUrl;
+    const basePrice = Number(peluche.variants[0].normalPrice);
+    const salePrice =
+      peluche.variants[0].offerPrice === null
+        ? null
+        : Number(peluche.variants[0].offerPrice);
 
     return new ImageResponse(
       (
@@ -238,8 +238,8 @@ export default async function OpengraphImage({
       {
         width: 1200,
         height: 630,
-      }
-    )
+      },
+    );
   } catch {
     // Fallback en caso de error
     return new ImageResponse(
@@ -296,7 +296,7 @@ export default async function OpengraphImage({
       {
         width: 1200,
         height: 630,
-      }
-    )
+      },
+    );
   }
 }

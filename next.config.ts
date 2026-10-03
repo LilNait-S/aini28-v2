@@ -1,4 +1,4 @@
-import type { NextConfig } from "next"
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // Compilador optimizado
@@ -8,6 +8,15 @@ const nextConfig: NextConfig = {
 
   // URLs consistentes sin trailing slashes
   trailingSlash: false,
+  async redirects() {
+    return [
+      {
+        source: "/studio/:path*",
+        destination: "https://app.aini28.com/website",
+        permanent: true,
+      },
+    ];
+  },
 
   // Optimización de imágenes para SEO y rendimiento
   images: {
@@ -18,22 +27,21 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
 
-    // Permitir imágenes de Sanity CDN
+    // Imágenes públicas del catálogo administrado por Plush.
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "cdn.sanity.io",
-        port: "",
-        pathname: "/images/**",
+        hostname: "api.aini28.com",
+        pathname: "/api/public/images/**",
       },
     ],
 
     // Optimización adicional
-    minimumCacheTTL: 31536000, // 1 año
+    minimumCacheTTL: 60,
 
     // SVG desactivado en el optimizador de imágenes: no se sirven SVG a través
     // de next/image (los SVG locales usan <img> directo y las imágenes remotas
-    // provienen solo de cdn.sanity.io en formatos rasterizados). Se mantienen
+    // provienen de las rutas públicas de imágenes de Plush). Se mantienen
     // las mitigaciones por defensa en profundidad si en el futuro se reactiva.
     dangerouslyAllowSVG: false,
     contentDispositionType: "attachment",
@@ -79,24 +87,16 @@ const nextConfig: NextConfig = {
         ],
       },
 
-      // Cache para imágenes
-      {
-        source: "/_next/image(.*)",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
-      },
-
       // Cache para assets de Next.js
       {
         source: "/_next/static/(.*)",
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
+            value:
+              process.env.NODE_ENV === "production"
+                ? "public, max-age=31536000, immutable"
+                : "no-store",
           },
         ],
       },
@@ -107,7 +107,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=86400, s-maxage=86400", // 24 horas
+            value: "no-store", // La publicación del catálogo puede cambiar.
           },
           {
             key: "Content-Type",
@@ -128,7 +128,7 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-    ]
+    ];
   },
 
   // Configuración para mejor build
@@ -143,11 +143,11 @@ const nextConfig: NextConfig = {
       config.resolve.fallback = {
         ...config.resolve.fallback,
         fs: false,
-      }
+      };
     }
 
-    return config
+    return config;
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;

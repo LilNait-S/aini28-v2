@@ -1,11 +1,11 @@
-import { getAllPeluches } from "@/lib/actions/product"
-import Link from "next/link"
-import { Fragment } from "react"
-import { ProductCard } from "../product-card"
-import { buttonVariants } from "../ui/button"
+import { getAllPeluches } from "@/lib/actions/product";
+import Link from "next/link";
+import { Fragment } from "react";
+import { ProductCard } from "../product-card";
+import { buttonVariants } from "../ui/button";
 
 export async function RecentlyAdded() {
-  const { products } = await getAllPeluches({ pageSize: 6 })
+  const { products } = await getAllPeluches({ pageSize: 6 });
 
   return (
     <section className="space-y-6">
@@ -23,7 +23,7 @@ export async function RecentlyAdded() {
       <main className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {products.map((peluche, i) => {
           return (
-            <Fragment key={peluche._id}>
+            <Fragment key={peluche.id}>
               {i === 2 && (
                 <img
                   src="/picture-recently-added.webp"
@@ -33,9 +33,9 @@ export async function RecentlyAdded() {
               )}
               <ProductCard {...peluche} className="w-full h-full" />
             </Fragment>
-          )
+          );
         })}
       </main>
     </section>
-  )
+  );
 }
