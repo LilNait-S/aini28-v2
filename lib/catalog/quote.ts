@@ -30,6 +30,10 @@ export function quoteCart(
       throw new UnpublishedItemError(
         "Este producto o variante ya no está publicado. Retíralo del carrito.",
       );
+    if (variant.availability === "SOLD_OUT")
+      throw new UnpublishedItemError(
+        `${product.name} (${Object.values(variant.attributes).join(" · ") || variant.sku}) se agotó. Retíralo del carrito.`,
+      );
     if (seen.has(variant.id))
       throw new UnpublishedItemError(
         "El carrito contiene una variante duplicada.",

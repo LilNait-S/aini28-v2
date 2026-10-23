@@ -1,6 +1,4 @@
 "use client";
-import { QuotedWhatsApp } from "@/components/quoted-whatsapp";
-
 import { useCartState } from "@/lib/states/shopping-car";
 import { CheckoutForm } from "./checkout-form";
 import { OrderSummary } from "./order-summary";
@@ -10,7 +8,7 @@ import Link from "next/link";
 import { Container } from "@/components/container";
 
 export default function Summary() {
-  const { cartItems, totalPrice, replaceCart } = useCartState();
+  const { cartItems, totalPrice } = useCartState();
 
   if (cartItems.length === 0) {
     return (
@@ -64,19 +62,6 @@ export default function Summary() {
           <div>
             <h2 className="text-xl font-semibold mb-4">Datos de Contacto</h2>
             <CheckoutForm />
-            <div className="mt-4">
-              <QuotedWhatsApp
-                items={cartItems.map(
-                  ({ _id, selectedSize, qty, finalPrice }) => ({
-                    _id,
-                    selectedSize,
-                    qty,
-                    finalPrice,
-                  }),
-                )}
-                onQuoted={replaceCart}
-              />
-            </div>
           </div>
         </div>
       </div>

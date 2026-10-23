@@ -17,10 +17,16 @@ Plush system development uses ports 5173/3000 independently.
 
 PLUSH_API_URL is server-only and defaults to https://api.aini28.com. It must be an
 HTTPS origin in production; local HTTP localhost/127.0.0.1 is allowed during
-development. Catalog API access is public/read-only: no API token or R2 secret.
+development. Catalog and company contact reads are public/read-only.
 
-Email uses the existing FROM_EMAIL_USER_AINI, FROM_EMAIL_PASS_AINI and TO_EMAIL
-server settings. NEXT_PUBLIC_SITE_URL is https://aini28.com in production.
+Checkout creates a Solicitud in Plush (POST /api/public/sale-requests) with
+the server-only PLUSH_WEBSITE_API_KEY. It must equal Plush's WEBSITE_API_KEY
+(at least 32 random characters, different per environment) and never use a
+NEXT_PUBLIC_ name. Without it the checkout answers 503.
+
+The customer confirmation email uses FROM_EMAIL_USER_AINI and
+FROM_EMAIL_PASS_AINI. Checkout no longer emails the store (requests live in
+the Plush Solicitudes inbox); TO_EMAIL is still used by the claims book. NEXT_PUBLIC_SITE_URL is https://aini28.com in production.
 Keep existing Turnstile and rate-limit settings. Never commit credentials or
 customer data. Sanity settings and tokens are no longer required by the website.
 

@@ -80,6 +80,7 @@ export function ProductCard(
       </ScrollArea>
       <Button
         type="button"
+        disabled={selected.availability === "SOLD_OUT"}
         onClick={() => {
           onAddToCart({
             _id: product.id,
@@ -97,9 +98,15 @@ export function ProductCard(
         }}
         className="text-xs sm:text-base flex gap-2"
       >
-        <ShoppingCart />
-        <span className="block lg:hidden">Agregar</span>
-        <span className="hidden lg:block">Agregar al carrito</span>
+        {selected.availability === "SOLD_OUT" ? (
+          "Agotado"
+        ) : (
+          <>
+            <ShoppingCart />
+            <span className="block lg:hidden">Agregar</span>
+            <span className="hidden lg:block">Agregar al carrito</span>
+          </>
+        )}
       </Button>
     </article>
   );

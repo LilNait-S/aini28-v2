@@ -28,8 +28,8 @@ export default function ConfirmacionPedido() {
         </div>
         <h1 className="text-3xl font-bold text-center">¡Solicitud recibida!</h1>
         <p className="text-muted-foreground text-center mt-2">
-          Recibimos tu solicitud. Coordinaremos contigo la venta, el pago y el
-          envío. Revisa tu correo para ver el resumen.
+          Te escribiremos por WhatsApp para confirmar tu pedido, el pago y la
+          entrega. Revisa tu correo para ver el resumen.
         </p>
       </div>
     </div>

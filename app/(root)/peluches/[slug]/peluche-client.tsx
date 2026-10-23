@@ -5,10 +5,21 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { sizeOptions } from "@/constants/sizes";
-import { QuotedWhatsApp } from "@/components/quoted-whatsapp";
 import { useCartState } from "@/lib/states/shopping-car";
-import { type Product, variantLabel, effectivePrice } from "@/types/catalog";
-import { ChevronDown, ChevronUp, ShoppingCart, Repeat } from "lucide-react";
+import {
+  type Company,
+  type Product,
+  variantLabel,
+  effectivePrice,
+  whatsappLink,
+} from "@/types/catalog";
+import {
+  ChevronDown,
+  ChevronUp,
+  MessageCircle,
+  ShoppingCart,
+  Repeat,
+} from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -16,9 +27,12 @@ import { cn } from "@/lib/utils";
 export function PelucheClient({
   peluche,
   slug,
+  whatsapp,
 }: {
   peluche: Product;
   slug: string;
+  /** Store contact from Plush; null hides the WhatsApp question link. */
+  whatsapp: Company | null;
 }) {
   const [variantId, setVariantId] = useQueryState(
     "variant",
@@ -34,6 +48,13 @@ export function PelucheClient({
     ) ??
     peluche.variants[0];
   const price = effectivePrice(variant);
+  const soldOut = variant.availability === "SOLD_OUT";
+  const pageUrl = `https://aini28.com/peluches/${slug}?variant=${variant.id}`;
+  // A question only, never an order: product link, no cart or total.
+  const askUrl = whatsappLink(
+    whatsapp,
+    `Hola, tengo una pregunta sobre ${peluche.name} (${variantLabel(variant)}): ${pageUrl}`,
+  );
   const { onAddToCart, qty, decQty, incQty } = useCartState();
   return (
     <>
@@ -50,6 +71,14 @@ export function PelucheClient({
           </div>
         )}
       </div>
+      <p
+        className={cn(
+          "text-sm font-medium",
+          soldOut ? "text-destructive" : "text-green-700",
+        )}
+      >
+        {soldOut ? "Agotado" : "Disponible"}
+      </p>
       <TypographyP text={peluche.description} />
       <div className="flex flex-col space-y-2">
       <TypographyMuted text={`Tamaño aproximado: ${Object.entries(variant.attributes).filter(([key]) => key !== "Tamaño").map(([, value]) => value).join(" · ") || variantLabel(variant)}`} />
@@ -97,6 +126,7 @@ export function PelucheClient({
         </div>
         <Button
           className="flex-1"
+          disabled={soldOut}
           onClick={() => {
             onAddToCart({
               _id: peluche.id,
@@ -115,16 +145,22 @@ export function PelucheClient({
           }}
         >
           <ShoppingCart />
-          Agregar al carrito
+          {soldOut ? "Agotado" : "Agregar al carrito"}
         </Button>
       </div>
       <div className="flex space-x-4">
       <div className="w-full">
-      <QuotedWhatsApp compact
-        items={[
-          { _id: peluche.id, selectedSize: variant.id, qty, finalPrice: price },
-        ]}
-      />
+        {askUrl ? (
+          <a
+            className="flex items-center justify-center gap-1 text-sm text-muted-foreground"
+            href={askUrl}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <MessageCircle className="size-3.5" />
+            Preguntar por WhatsApp
+          </a>
+        ) : null}
       </div>
       <Separator orientation="vertical" className="h-5" />
       <button className="flex items-start justify-center gap-1 cursor-pointer w-full" type="button" onClick={async () => {

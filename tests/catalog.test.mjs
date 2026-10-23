@@ -11,6 +11,7 @@ import {
   effectivePrice,
   variantLabel,
   catalogSchema,
+  whatsappLink,
 } from "../types/catalog.ts";
 
 const variant = {
@@ -135,4 +136,34 @@ test("a malformed upstream response is rejected instead of rendering a price", (
     }).success,
     false,
   );
+});
+test("availability defaults to available and a sold-out variant cannot be quoted", () => {
+  const parsed = catalogSchema.parse({
+    products: [
+      {
+        ...product,
+        featured: false,
+        description: "x",
+        updatedAt: "2026-10-23T00:00:00.000Z",
+      },
+    ],
+    total: 1,
+    totalPages: 1,
+  });
+  assert.equal(parsed.products[0].variants[0].availability, "AVAILABLE");
+  assert.throws(
+    () =>
+      quoteCart(request, [
+        { ...product, variants: [{ ...variant, availability: "SOLD_OUT" }] },
+      ]),
+    /se agotó/,
+  );
+});
+test("the store WhatsApp link adds Peru's prefix and encodes the message", () => {
+  const company = { whatsapp: "927 742 710" };
+  assert.equal(
+    whatsappLink(company, "Hola María"),
+    "https://wa.me/51927742710?text=Hola%20Mar%C3%ADa",
+  );
+  assert.equal(whatsappLink({ whatsapp: "" }), null);
 });

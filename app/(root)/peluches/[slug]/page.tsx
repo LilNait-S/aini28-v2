@@ -1,5 +1,6 @@
 import { Container } from "@/components/container";
 import { getPeluche } from "@/lib/actions/product";
+import { readCompany } from "@/lib/catalog/plush";
 import { Params } from "@/types/params";
 import { PelucheBreadcrumb } from "./peluche-breadcrumb";
 import { PelucheClient } from "./peluche-client";
@@ -38,7 +39,10 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 }
 export default async function Peluche({ params }: Params) {
   const { slug } = await params;
-  const peluche = await getPeluche({ slug });
+  const [peluche, company] = await Promise.all([
+    getPeluche({ slug }),
+    readCompany(),
+  ]);
   if (!peluche) notFound();
   return (
     <>
@@ -55,7 +59,7 @@ export default async function Peluche({ params }: Params) {
               <h1 className="text-2xl sm:text-4xl font-bold tracking-tight">
                 {peluche.name}
               </h1>
-              <PelucheClient peluche={peluche} slug={slug} />
+              <PelucheClient peluche={peluche} slug={slug} whatsapp={company} />
             </div>
           </div>
         </section>

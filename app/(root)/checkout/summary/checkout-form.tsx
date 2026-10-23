@@ -1,98 +1,199 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Country, CountryDropdown } from "@/components/ui/country-dropdown";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { PhoneInput } from "@/components/ui/phone-input";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useCartState } from "@/lib/states/shopping-car";
+import { deliveryTypeLabels, paymentMethodLabels } from "@/lib/checkout";
 import {
-  CustomerContact,
+  listDepartments,
+  listDistricts,
+  listMotorbikeProvinces,
+  listProvinces,
+} from "@/lib/ubigeo";
+import {
   customerContactSchema,
+  type CustomerContact,
 } from "@/lib/validations/customer-contact";
 import { useOrder } from "@/services/api/order";
-import { OrderPayload } from "@/types/order";
 import { Turnstile, captchaEnabled } from "@/components/security/turnstile";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import {
-  departamentosPeru,
-  distritosPorProvincia,
-  paymentMethods,
-  provinciasLima,
-  shippingMethods,
-} from "./checkout-data";
+import { z } from "zod";
 import { useRouter } from "next/navigation";
+
+/** Flat form fields; on submit they become the Plush delivery shape. */
+const formSchema = z
+  .object({
+    fullName: z.string(),
+    phoneNumber: z.string(),
+    email: z.string(),
+    paymentMethod: z.string(),
+    deliveryType: z.string(),
+    department: z.string(),
+    province: z.string(),
+    district: z.string(),
+    address: z.string(),
+  })
+  .superRefine((value, context) => {
+    const result = customerContactSchema.safeParse(toContact(value));
+    if (result.success) return;
+    for (const issue of result.error.issues) {
+      const [first, second] = issue.path;
+      const path =
+        first === "delivery"
+          ? second === "ubigeo"
+            ? "district"
+            : second === "address"
+              ? "address"
+              : "deliveryType"
+          : String(first);
+      context.addIssue({ code: "custom", message: issue.message, path: [path] });
+    }
+  });
+type FormValues = z.infer<typeof formSchema>;
+
+function toContact(value: FormValues): CustomerContact {
+  const delivery =
+    value.deliveryType === "MOTORBIKE"
+      ? {
+          type: "MOTORBIKE" as const,
+          ubigeo: value.district,
+          address: value.address.trim(),
+        }
+      : value.deliveryType === "AGENCY"
+        ? { type: "AGENCY" as const, ubigeo: value.district }
+        : { type: "PICKUP" as const };
+  return {
+    fullName: value.fullName.trim(),
+    phoneNumber: value.phoneNumber,
+    email: value.email.trim(),
+    paymentMethod: value.paymentMethod as CustomerContact["paymentMethod"],
+    delivery: value.deliveryType
+      ? delivery
+      : (undefined as unknown as CustomerContact["delivery"]),
+  };
+}
 
 export function CheckoutForm() {
   const { cartItems, resetCart } = useCartState();
-  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const [captchaToken, setCaptchaToken] = useState("");
   const { createOrder, loading } = useOrder();
+  const requestId = useRef(crypto.randomUUID());
   const { push } = useRouter();
-  const form = useForm<CustomerContact>({
-    resolver: zodResolver(customerContactSchema),
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       fullName: "",
-      email: "",
       phoneNumber: "",
-      country: "Peru",
-      department: "",
+      email: "",
       paymentMethod: "",
-      shippingMethod: "",
+      deliveryType: "",
+      department: "",
       province: "",
       district: "",
       address: "",
     },
   });
+  const deliveryType = form.watch("deliveryType");
+  const department = form.watch("department");
+  const province = form.watch("province");
+  const provinces =
+    deliveryType === "MOTORBIKE"
+      ? listMotorbikeProvinces()
+      : listProvinces(department);
 
-  function onSubmit(values: CustomerContact) {
-    const orderDetails: OrderPayload = {
-      userDetails: values,
+  function onSubmit(values: FormValues) {
+    createOrder({
+      clientRequestId: requestId.current,
+      userDetails: toContact(values),
       cartItems,
       captchaToken,
-    };
-    createOrder(orderDetails)
-      .then(() => {
+    })
+      .then(({ emailSent }) => {
         toast.success("Solicitud enviada", {
-          description:
-            "Recibimos tu solicitud. Coordinaremos la venta contigo.",
+          description: emailSent
+            ? "Te escribiremos por WhatsApp para confirmar tu pedido."
+            : "Te escribiremos por WhatsApp. No pudimos enviarte el correo de confirmación.",
         });
         form.reset();
         resetCart();
         push("/checkout/confirmation");
       })
-      .catch((error: Error) => {
+      .catch((error: Error & { status?: number }) => {
+        if (error.status && error.status < 500)
+          requestId.current = crypto.randomUUID();
         toast.error("No se envió la solicitud", {
           description: error.message,
         });
       });
   }
 
-  const { watch } = form;
+  const selectField = (
+    name: "department" | "province" | "district",
+    label: string,
+    options: { code: string; name: string }[],
+    placeholder: string,
+    reset: ("province" | "district")[],
+  ) => (
+    <FormField
+      control={form.control}
+      name={name}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel htmlFor={name}>{label}</FormLabel>
+          <Select
+            onValueChange={(value) => {
+              field.onChange(value);
+              for (const child of reset) form.setValue(child, "");
+            }}
+            value={field.value}
+            disabled={!options.length}
+          >
+            <FormControl>
+              <SelectTrigger id={name} className="w-full">
+                <SelectValue placeholder={placeholder} />
+              </SelectTrigger>
+            </FormControl>
+            <SelectContent>
+              {options.map((option) => (
+                <SelectItem key={option.code} value={option.code}>
+                  {option.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4"
+        autoComplete="on"
+      >
         <FormField
           control={form.control}
           name="fullName"
@@ -100,8 +201,40 @@ export function CheckoutForm() {
             <FormItem>
               <FormLabel>Nombre completo</FormLabel>
               <FormControl>
-                <Input placeholder="Escribe tu nombre completo" {...field} />
+                <Input
+                  autoComplete="name"
+                  placeholder="Escribe tu nombre completo"
+                  {...field}
+                />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="phoneNumber"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>WhatsApp</FormLabel>
+              <FormControl>
+                <div className="flex items-center">
+                  <span className="flex h-9 items-center rounded-l-md border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground">
+                    +51
+                  </span>
+                  <Input
+                    className="rounded-l-none"
+                    autoComplete="tel-national"
+                    inputMode="tel"
+                    placeholder="987 654 321"
+                    {...field}
+                  />
+                </div>
+              </FormControl>
+              <FormDescription>
+                Te escribiremos aquí para confirmar tu pedido.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -114,46 +247,16 @@ export function CheckoutForm() {
             <FormItem>
               <FormLabel>Correo electrónico</FormLabel>
               <FormControl>
-                <Input placeholder="tu@correo.com" {...field} />
+                <Input
+                  autoComplete="email"
+                  inputMode="email"
+                  placeholder="tu@correo.com"
+                  {...field}
+                />
               </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="phoneNumber"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Celular</FormLabel>
-              <FormControl>
-                <div className="flex items-center w-full">
-                  <CountryDropdown
-                    onChange={(country) => {
-                      setSelectedCountry(country);
-
-                      const countryCode = country.countryCallingCodes[0];
-                      const formattedCode = countryCode.startsWith("+")
-                        ? countryCode
-                        : `+${countryCode}`;
-                      form.setValue("phoneNumber", formattedCode);
-                    }}
-                    defaultValue={selectedCountry?.alpha3}
-                    inline
-                  />
-                  <PhoneInput
-                    {...field}
-                    value={field.value}
-                    placeholder="Ej: +51987654321"
-                    defaultCountry={selectedCountry?.alpha2}
-                    onCountryChange={(country) => {
-                      setSelectedCountry(country as Country);
-                    }}
-                    inline
-                  />
-                </div>
-              </FormControl>
+              <FormDescription>
+                Te enviaremos el resumen de tu solicitud.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -164,19 +267,24 @@ export function CheckoutForm() {
           name="paymentMethod"
           render={({ field }) => (
             <FormItem>
-              <FormLabel htmlFor="paymentMethod">Metodo de pago</FormLabel>
+              <FormLabel htmlFor="paymentMethod">Pagarás con</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
-                <SelectTrigger id="paymentMethod" className="w-full">
-                  <SelectValue placeholder="Selecciona un metodo de pago" />
-                </SelectTrigger>
+                <FormControl>
+                  <SelectTrigger id="paymentMethod" className="w-full">
+                    <SelectValue placeholder="Elige cómo pagarás" />
+                  </SelectTrigger>
+                </FormControl>
                 <SelectContent>
-                  {paymentMethods.map(({ label, value }) => (
+                  {Object.entries(paymentMethodLabels).map(([value, label]) => (
                     <SelectItem key={value} value={value}>
                       {label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              <FormDescription>
+                El pedido se paga completo antes de salir de la tienda.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -184,185 +292,99 @@ export function CheckoutForm() {
 
         <FormField
           control={form.control}
-          name="shippingMethod"
+          name="deliveryType"
           render={({ field }) => (
             <FormItem>
-              <FormLabel htmlFor="shippingMethod">Metodo de envio</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <SelectTrigger id="shippingMethod" className="w-full">
-                  <SelectValue placeholder="Selecciona un metodo de envio" />
-                </SelectTrigger>
+              <FormLabel htmlFor="deliveryType">Entrega</FormLabel>
+              <Select
+                onValueChange={(value) => {
+                  field.onChange(value);
+                  for (const child of [
+                    "department",
+                    "province",
+                    "district",
+                  ] as const)
+                    form.setValue(child, "");
+                }}
+                value={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger id="deliveryType" className="w-full">
+                    <SelectValue placeholder="Elige cómo recibirás tu pedido" />
+                  </SelectTrigger>
+                </FormControl>
                 <SelectContent>
-                  {shippingMethods.map(({ label, value }) => (
+                  {Object.entries(deliveryTypeLabels).map(([value, label]) => (
                     <SelectItem key={value} value={value}>
                       {label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              <FormDescription>
+                El costo de envío se coordina por WhatsApp.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        {watch("shippingMethod") === "Envío Estándar" && (
+        {deliveryType === "MOTORBIKE" || deliveryType === "AGENCY" ? (
           <>
             <Separator />
-            <h2 className="text-xl font-semibold mb-4">Información de envío</h2>
-
-            <FormField
-              control={form.control}
-              name="country"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel htmlFor="country">Pais</FormLabel>
-                  <Select
-                    value="Peru"
-                    disabled
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <SelectTrigger id="country" className="w-full">
-                      <SelectValue placeholder="Selecciona un país" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Fruits</SelectLabel>
-                        <SelectItem value="Peru">Perú</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="department"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel htmlFor="department">Departamento</FormLabel>
-                  <Select
-                    onValueChange={(value) => {
-                      field.onChange(value);
-                      form.setValue("province", "");
-                      form.setValue("district", "");
-                    }}
-                    value={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger id="department" className="w-full">
-                        <SelectValue placeholder="Selecciona tu departamento" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Departamentos del Perú</SelectLabel>
-                        {departamentosPeru.map((departamento) => (
-                          <SelectItem key={departamento} value={departamento}>
-                            {departamento}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {watch("department") === "Lima" && (
+            <h2 className="text-xl font-semibold">
+              {deliveryType === "MOTORBIKE"
+                ? "¿Dónde lo entregamos?"
+                : "¿A qué ciudad lo enviamos?"}
+            </h2>
+            {deliveryType === "AGENCY"
+              ? selectField(
+                  "department",
+                  "Departamento",
+                  listDepartments(),
+                  "Elige tu departamento",
+                  ["province", "district"],
+                )
+              : null}
+            {selectField(
+              "province",
+              "Provincia",
+              provinces,
+              "Elige tu provincia",
+              ["district"],
+            )}
+            {selectField(
+              "district",
+              "Distrito",
+              listDistricts(province),
+              "Elige tu distrito",
+              [],
+            )}
+            {deliveryType === "MOTORBIKE" ? (
               <FormField
                 control={form.control}
-                name="province"
+                name="address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel htmlFor="province">Provincia</FormLabel>
-                    <Select
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        form.setValue("district", "");
-                      }}
-                      value={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger id="province" className="w-full">
-                          <SelectValue placeholder="Selecciona tu provincia" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Provincias</SelectLabel>
-                          {provinciasLima.map((provincia) => (
-                            <SelectItem key={provincia} value={provincia}>
-                              {provincia}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
+                    <FormLabel>Dirección</FormLabel>
+                    <FormControl>
+                      <Input
+                        autoComplete="street-address"
+                        placeholder="Calle, número y referencia"
+                        {...field}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Te pediremos por WhatsApp el DNI y la sede de la agencia.
+              </p>
             )}
-
-            {watch("province") &&
-              distritosPorProvincia[
-                watch("province") as keyof typeof distritosPorProvincia
-              ] && (
-                <FormField
-                  control={form.control}
-                  name="district"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel htmlFor="district">Distrito</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger id="district" className="w-full">
-                            <SelectValue placeholder="Selecciona tu distrito" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Distritos</SelectLabel>
-                            {distritosPorProvincia[
-                              watch(
-                                "province",
-                              ) as keyof typeof distritosPorProvincia
-                            ].map((distrito) => (
-                              <SelectItem key={distrito} value={distrito}>
-                                {distrito}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
-            <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Dirección</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Escribe tu dirección" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </>
-        )}
+        ) : null}
 
         <Turnstile onToken={setCaptchaToken} />
 
@@ -377,8 +399,8 @@ export function CheckoutForm() {
           }
         >
           {form.formState.isSubmitting || loading
-            ? "Cargando..."
-            : "Enviar solicitud por correo"}
+            ? "Enviando..."
+            : "Enviar solicitud"}
         </Button>
       </form>
     </Form>

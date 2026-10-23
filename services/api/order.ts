@@ -7,27 +7,40 @@ export const useOrder = (onSuccess?: () => void) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<unknown>(null);
 
+  /** Records the Solicitud in Plush; resolves whether the email was sent. */
   const createOrder = async (payload: OrderPayload) => {
     setLoading(true);
     setError(null);
     try {
-      // // Crear la orden
-      // await genericAuthRequest("post", `/orders`, payload)
-
-      // Enviar el correo
-      await axios.post("/api/send-email", payload);
-
+      const { data } = await axios.post<{ emailSent: boolean }>(
+        "/api/requests",
+        payload,
+      );
       if (onSuccess) onSuccess();
+      return data;
     } catch (err) {
-      if (axios.isAxiosError(err) && err.response?.data?.quote) {
-        useCartState.getState().replaceCart(err.response.data.quote.cartItems);
+      if (axios.isAxiosError(err)) {
+        const data = err.response?.data;
+        const cart = useCartState.getState();
+        // Show the current prices, or drop what sold out, before a retry.
+        if (data?.quote) cart.replaceCart(data.quote.cartItems);
+        else if (Array.isArray(data?.unavailable))
+          cart.replaceCart(
+            cart.cartItems.filter(
+              (item) => !data.unavailable.includes(item.selectedSize),
+            ),
+          );
       }
       setError(err);
-      throw new Error(
-        axios.isAxiosError(err)
-          ? err.response?.data?.message ||
-            "No pudimos enviar la solicitud. Intenta nuevamente."
-          : "No pudimos enviar la solicitud. Intenta nuevamente.",
+      throw Object.assign(
+        new Error(
+          axios.isAxiosError(err)
+            ? err.response?.data?.message ||
+              "No pudimos enviar la solicitud. Intenta nuevamente."
+            : "No pudimos enviar la solicitud. Intenta nuevamente.",
+        ),
+        // A rejected (4xx) request needs a new id; a network failure keeps it.
+        { status: axios.isAxiosError(err) ? err.response?.status : undefined },
       );
     } finally {
       setLoading(false);

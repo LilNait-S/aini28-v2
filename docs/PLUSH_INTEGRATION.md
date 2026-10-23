@@ -193,3 +193,43 @@ Phase 4 browser follow-up found and fixed size-filter defaults: cards initialize
 Final phase 4 build PASSED after the card variant correction. Preview restored at localhost:3002 (development, public Plush reads only; no external writes).
 
 Phase 5 release: final source build, TypeScript, lint and 10 focused tests passed. Local SMTP connection/authentication verified without sending an email; deployed delivery remains a manual check. Release via GitHub PR and the existing Vercel Git integration, retaining existing production SMTP/CAPTCHA configuration. Production verification will be recorded in the Plush implementation handoff.
+
+## Phase 6: checkout creates Plush Solicitudes (Hito 11 task 8, 2026-10-23)
+
+Implemented on branch feat/solicitudes-checkout (local, not pushed or deployed).
+
+- Checkout fields match Plush: name, WhatsApp (Peruvian mobile, stored as
+  +519XXXXXXXX), email, payment Yape/Plin/transfer (no cash), delivery
+  Recojo / Motorizado (only Lima Metropolitana 1501 and Callao 0701) /
+  Agencia, with the INEI ubigeo lists Plush uses (lib/ubigeo, MIT data from
+  jmcastagnetto/ubigeo-peru-aumentado). Country field and the hand-written
+  Lima district lists were removed. Motorbike asks for the address; agency
+  DNI/branch are coordinated by WhatsApp.
+- POST /api/requests (replaces /api/send-email): Origin, size, rate limit and
+  Turnstile guards, then server-to-server POST to Plush with
+  PLUSH_WEBSITE_API_KEY. Plush reprices; a changed price returns 409 with the
+  current quote (cart replaced, customer resends), sold-out lines return 409
+  and are removed from the cart. Same clientRequestId on network retries
+  (idempotent in Plush), new id after a 4xx. The store notification email is
+  gone; only the customer confirmation is sent, and a failed email does not
+  fail the request (the Solicitud already exists).
+- Public variants carry availability (default AVAILABLE for older Plush
+  APIs): product detail shows Disponible/Agotado; detail and cards cannot add
+  a SOLD_OUT variant; quote rejects it.
+- WhatsApp: the prepared-order flow (/api/catalog/quote route and
+  QuotedWhatsApp) was removed. The product detail keeps "Preguntar por
+  WhatsApp" (product link only, no cart/total), shown only when Plush has a
+  store WhatsApp.
+- Company contact (footer, Organization JSON-LD, WhatsApp link) comes from
+  Plush GET /api/public/company, cached 5 minutes; missing fields are hidden.
+  COMPANY keeps only the static name/site URL.
+
+Verified: tsc, zero-warning lint, production build, test:catalog 12/12.
+Local end-to-end against local Plush (test key, SMTP credentials blanked so
+no real email): detail Disponible → cart → checkout motorbike to Miraflores
+→ Solicitud stored WEB/NEW with +51900000777, YAPE, ubigeo 150122, address
+and 90.00 NORMAL → confirmation page. Stale price via the route → 409 with
+the current quote. The QA Solicitud was deleted afterwards.
+
+Release (task 9): set WEBSITE_API_KEY (Railway) and PLUSH_WEBSITE_API_KEY
+(Vercel) to the same new secret, deploy Plush first, then Aini28.

@@ -2,9 +2,9 @@ import { z } from "zod";
 import { customerContactSchema } from "./customer-contact";
 
 /**
- * Esquema de un ítem del carrito tal como lo consume el endpoint de correo.
- * Se validan los campos usados en el email con límites razonables; los campos
- * no usados (p. ej. `images`) se permiten sin validación estricta.
+ * Esquema de un ítem del carrito tal como lo consume el endpoint de
+ * solicitudes. Plush vuelve a cotizar todo en su servidor; `finalPrice` es el
+ * precio que el cliente vio y solo sirve para detectar cambios.
  */
 export const cartItemSchema = z
   .object({
@@ -21,6 +21,8 @@ export const cartItemSchema = z
   .passthrough();
 
 export const orderPayloadSchema = z.object({
+  /** Same id on retries, so Plush records the Solicitud only once. */
+  clientRequestId: z.string().uuid(),
   userDetails: customerContactSchema,
   cartItems: z.array(cartItemSchema).min(1).max(200),
 });
