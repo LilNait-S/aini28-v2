@@ -103,15 +103,21 @@ export async function rateLimit(
   { limit, windowMs }: { limit: number; windowMs: number }
 ): Promise<RateLimitResult> {
   if (hasUpstash) {
-    const { success, limit: lim, remaining, reset } = await getUpstashLimiter(
-      limit,
-      windowMs
-    ).limit(key)
-    return {
-      success,
-      limit: lim,
-      remaining,
-      retryAfter: success ? 0 : Math.max(0, Math.ceil((reset - Date.now()) / 1000)),
+    try {
+      const { success, limit: lim, remaining, reset } = await getUpstashLimiter(
+        limit,
+        windowMs
+      ).limit(key)
+      return {
+        success,
+        limit: lim,
+        remaining,
+        retryAfter: success ? 0 : Math.max(0, Math.ceil((reset - Date.now()) / 1000)),
+      }
+    } catch {
+      // An unreachable or deleted Upstash database must not take down the
+      // checkout and claims forms: degrade to the per-instance limiter.
+      console.error("Rate limit: Upstash no disponible, se usa el límite en memoria.")
     }
   }
 
