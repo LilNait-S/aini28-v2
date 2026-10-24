@@ -5,6 +5,7 @@ import { catalogMetadata } from "../lib/seo/catalog-metadata.ts";
 import {
   quoteCart,
   quoteRequestSchema,
+  recordedEmailLines,
   UnpublishedItemError,
 } from "../lib/catalog/quote.ts";
 import {
@@ -12,6 +13,7 @@ import {
   variantLabel,
   catalogSchema,
   whatsappLink,
+  companySchema,
 } from "../types/catalog.ts";
 
 const variant = {
@@ -166,4 +168,39 @@ test("the store WhatsApp link adds Peru's prefix and encodes the message", () =>
     "https://wa.me/51927742710?text=Hola%20Mar%C3%ADa",
   );
   assert.equal(whatsappLink({ whatsapp: "" }), null);
+});
+test("confirmation email lines use Plush data, never browser text", () => {
+  const lines = recordedEmailLines(
+    [{ variantId: variant.id, quantity: 2, unitPrice: "45.00" }],
+    [product],
+  );
+  assert.deepEqual(lines, [
+    {
+      name: "Peluche oficial",
+      qty: 2,
+      finalPrice: 45,
+      variantLabel: "Azul · 40 cm",
+    },
+  ]);
+  assert.throws(() => recordedEmailLines([{ variantId: "x" }], [product]));
+});
+test("store links from Plush must be http(s) to be rendered", () => {
+  const base = {
+    name: "Aini28",
+    whatsapp: "",
+    email: "",
+    address: "",
+    district: "",
+    province: "",
+    department: "",
+    reference: "",
+  };
+  const parsed = companySchema.parse({
+    ...base,
+    mapsUrl: "https://maps.app.goo.gl/x",
+    tiktokUrl: "javascript:alert(1)",
+    instagramUrl: "",
+  });
+  assert.equal(parsed.mapsUrl, "https://maps.app.goo.gl/x");
+  assert.equal(parsed.tiktokUrl, "");
 });

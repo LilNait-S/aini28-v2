@@ -35,7 +35,12 @@ export const customerContactSchema = z.object({
     .string()
     .trim()
     .min(2, "Escribe tu nombre completo")
-    .max(120, "Usa como máximo 120 caracteres"),
+    .max(120, "Usa como máximo 120 caracteres")
+    // Letters only: the name is echoed in the confirmation email.
+    .regex(
+      /^[\p{L}][\p{L} .'-]*$/u,
+      "Escribe tu nombre solo con letras",
+    ),
   phoneNumber: z
     .string()
     .trim()

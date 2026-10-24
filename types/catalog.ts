@@ -39,6 +39,10 @@ export const bannerSchema = z.object({
   imageUrl: z.string().url(),
 });
 export const bannersSchema = z.object({ banners: z.array(bannerSchema) });
+/** Rendered as href: anything but an http(s) link is dropped. */
+const link = z
+  .string()
+  .transform((value) => (/^https?:\/\//i.test(value) ? value : ""));
 /** Public contact data the store manages in Plush. */
 export const companySchema = z.object({
   name: z.string(),
@@ -49,9 +53,9 @@ export const companySchema = z.object({
   province: z.string(),
   department: z.string(),
   reference: z.string(),
-  mapsUrl: z.string(),
-  tiktokUrl: z.string(),
-  instagramUrl: z.string(),
+  mapsUrl: link,
+  tiktokUrl: link,
+  instagramUrl: link,
 });
 export type Company = z.infer<typeof companySchema>;
 /** wa.me link to the store WhatsApp, or null when Plush has none. */

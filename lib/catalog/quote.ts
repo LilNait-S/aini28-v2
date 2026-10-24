@@ -79,3 +79,33 @@ export function quoteCart(
     ),
   };
 }
+
+const recordedItemsSchema = z.array(
+  z.object({
+    variantId: z.string(),
+    quantity: z.number().int().positive(),
+    unitPrice: z.string().regex(/^\d+(?:\.\d{1,2})?$/),
+  }),
+);
+
+/**
+ * Confirmation email lines from what Plush recorded (variant, quantity,
+ * frozen price) and the Plush catalog names. Browser-sent names never reach
+ * an email sent from the store's account.
+ */
+export function recordedEmailLines(items: unknown, products: Product[]) {
+  return recordedItemsSchema.parse(items).map((item) => {
+    const product = products.find((p) =>
+      p.variants.some((v) => v.id === item.variantId),
+    );
+    const variant = product?.variants.find((v) => v.id === item.variantId);
+    return {
+      name: product?.name ?? "Peluche",
+      qty: item.quantity,
+      finalPrice: Number(item.unitPrice),
+      variantLabel: variant
+        ? Object.values(variant.attributes).join(" · ") || variant.sku
+        : "",
+    };
+  });
+}

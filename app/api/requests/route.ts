@@ -1,10 +1,18 @@
 import OrderSummaryEmail from "@/components/email/order-summary-email";
-import { guardMailRequest } from "@/lib/security/request-guards";
+import {
+  exceedsMaxBody,
+  guardMailRequest,
+  verifyOrigin,
+} from "@/lib/security/request-guards";
 import { orderPayloadSchema } from "@/lib/validations/order";
 import { peruvianMobile } from "@/lib/validations/customer-contact";
 import { deliveryLabel, paymentMethodLabels } from "@/lib/checkout";
 import { createSaleRequest, readAllProducts } from "@/lib/catalog/plush";
-import { quoteCart, UnpublishedItemError } from "@/lib/catalog/quote";
+import {
+  quoteCart,
+  recordedEmailLines,
+  UnpublishedItemError,
+} from "@/lib/catalog/quote";
 import { render } from "@react-email/render";
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
@@ -18,6 +26,14 @@ const retryMessage = "No pudimos enviar tu solicitud. Intenta nuevamente.";
  * confirmation email; the store works the request from its Plush inbox.
  */
 export async function POST(req: NextRequest) {
+  // Cheap checks before reading the body; the full guard runs after parsing.
+  if (!verifyOrigin(req))
+    return NextResponse.json({ message: "Origen no permitido" }, { status: 403 });
+  if (exceedsMaxBody(req))
+    return NextResponse.json(
+      { message: "Payload demasiado grande" },
+      { status: 413 },
+    );
   let body: unknown;
   try {
     body = await req.json();
@@ -114,16 +130,8 @@ export async function POST(req: NextRequest) {
         total: Number(plush.body.total),
         paymentMethod: paymentMethodLabels[userDetails.paymentMethod],
         delivery: deliveryLabel(userDetails.delivery),
-        address:
-          userDetails.delivery.type === "MOTORBIKE"
-            ? userDetails.delivery.address
-            : undefined,
-        cartItems: cartItems.map((item) => ({
-          name: item.name,
-          qty: item.qty,
-          finalPrice: item.finalPrice,
-          variantLabel: item.variantLabel,
-        })),
+        // Only Plush data: the browser's product names never reach the email.
+        cartItems: await emailLines(plush.body.items),
       }),
     );
     const transporter = nodemailer.createTransport({
@@ -145,4 +153,13 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ message: "Solicitud registrada", emailSent });
+}
+
+/**
+ * Email lines from what Plush recorded (variant, quantity, frozen price) and
+ * the Plush catalog names, so a forged request cannot put its own text in a
+ * message sent from the store's account.
+ */
+async function emailLines(items: unknown) {
+  return recordedEmailLines(items, await readAllProducts());
 }
