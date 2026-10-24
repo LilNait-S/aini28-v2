@@ -27,7 +27,13 @@ export async function FeaturedProducts() {
       <ScrollArea className="whitespace-nowrap">
         <div className="flex w-max space-x-8 pb-4 pl-4">
           {products.map((product) => (
-            <ProductCard key={product.id} {...product} />
+            // Fixed width: Plush serves full-size images, which would
+            // otherwise stretch a card to the photo's own width.
+            <ProductCard
+              key={product.id}
+              {...product}
+              className="w-64 sm:w-72 lg:w-80 shrink-0"
+            />
           ))}
         </div>
         <ScrollBar orientation="horizontal" />
