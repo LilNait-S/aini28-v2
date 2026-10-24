@@ -196,7 +196,8 @@ Phase 5 release: final source build, TypeScript, lint and 10 focused tests passe
 
 ## Phase 6: checkout creates Plush Solicitudes (Hito 11 task 8, 2026-10-23)
 
-Implemented on branch feat/solicitudes-checkout (local, not pushed or deployed).
+Published 2026-10-23: main 8b17451 (this phase) and 9f9abfd (rate-limit fix
+below), both deployed by Vercel after Plush was released on Railway.
 
 - Checkout fields match Plush: name, WhatsApp (Peruvian mobile, stored as
   +519XXXXXXXX), email, payment Yape/Plin/transfer (no cash), delivery
@@ -231,5 +232,18 @@ no real email): detail Disponible → cart → checkout motorbike to Miraflores
 and 90.00 NORMAL → confirmation page. Stale price via the route → 409 with
 the current quote. The QA Solicitud was deleted afterwards.
 
-Release (task 9): set WEBSITE_API_KEY (Railway) and PLUSH_WEBSITE_API_KEY
-(Vercel) to the same new secret, deploy Plush first, then Aini28.
+Release (task 9): WEBSITE_API_KEY (Railway API) and PLUSH_WEBSITE_API_KEY
+(Vercel Production) hold the same secret; Plush was deployed first, then
+Aini28.
+
+Production finding after release: /api/requests and /api/send-claim answered
+500 because the Upstash rate limiter threw (Vercel Upstash/KV integration
+broken). 9f9abfd makes rateLimit fall back to the in-memory limiter when
+Upstash fails; production then answered 403 (Turnstile) to empty requests.
+The in-memory limit is per serverless instance, so Turnstile is the main bot
+control while Upstash is not working.
+
+Verified in production 2026-10-23: 32/32 variants AVAILABLE, product detail
+"Disponible", footer, JSON-LD and "Preguntar por WhatsApp" use the store
+data from Plush. Pending: one real checkout (needs a human Turnstile pass)
+seen in the Plush inbox; decide whether to repair or remove Upstash.
