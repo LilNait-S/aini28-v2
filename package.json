@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test:checkout": "node --experimental-strip-types --test tests/checkout.test.mjs",
     "test:catalog": "node --experimental-strip-types --test tests/catalog.test.mjs"
   },
   "dependencies": {

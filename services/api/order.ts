@@ -1,3 +1,4 @@
+import { receiptSchema, type CheckoutReceipt } from "@/lib/checkout-receipt";
 import { OrderPayload } from "@/types/order";
 import { useState } from "react";
 import axios from "axios";
@@ -12,12 +13,12 @@ export const useOrder = (onSuccess?: () => void) => {
     setLoading(true);
     setError(null);
     try {
-      const { data } = await axios.post<{ emailSent: boolean }>(
+      const { data } = await axios.post<CheckoutReceipt>(
         "/api/requests",
         payload,
       );
       if (onSuccess) onSuccess();
-      return data;
+      return receiptSchema.parse(data);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const data = err.response?.data;

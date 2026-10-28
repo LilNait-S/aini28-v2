@@ -33,6 +33,7 @@ import {
   customerContactSchema,
   type CustomerContact,
 } from "@/lib/validations/customer-contact";
+import { saveReceipt } from "@/lib/checkout-receipt";
 import { useOrder } from "@/services/api/order";
 import { Turnstile, captchaEnabled } from "@/components/security/turnstile";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -68,12 +69,16 @@ const formSchema = z
           ? second === "agencyId" || second === "agencyNote"
             ? "agencyId"
             : second === "ubigeo"
-            ? "district"
-            : second === "address"
-              ? "address"
-              : "deliveryType"
+              ? "district"
+              : second === "address"
+                ? "address"
+                : "deliveryType"
           : String(first);
-      context.addIssue({ code: "custom", message: issue.message, path: [path] });
+      context.addIssue({
+        code: "custom",
+        message: issue.message,
+        path: [path],
+      });
     }
   });
 type FormValues = z.infer<typeof formSchema>;
@@ -87,7 +92,15 @@ function toContact(value: FormValues): CustomerContact {
           address: value.address.trim(),
         }
       : value.deliveryType === "AGENCY"
-        ? { type: "AGENCY" as const, ubigeo: value.district, ...(value.unknownAgency ? {agencyNote: value.agencyNote} : value.agencyId ? {agencyId: value.agencyId} : {}) }
+        ? {
+            type: "AGENCY" as const,
+            ubigeo: value.district,
+            ...(value.unknownAgency
+              ? { agencyNote: value.agencyNote }
+              : value.agencyId
+                ? { agencyId: value.agencyId }
+                : {}),
+          }
         : { type: "PICKUP" as const };
   return {
     fullName: value.fullName.trim(),
@@ -133,19 +146,16 @@ export function CheckoutForm() {
       ? listMotorbikeProvinces()
       : listProvinces(department);
 
-  function onSubmit(values: FormValues) {
-    createOrder({
+  async function onSubmit(values: FormValues) {
+    await createOrder({
       clientRequestId: requestId.current,
       userDetails: toContact(values),
       cartItems,
       captchaToken,
     })
-      .then(({ emailSent }) => {
-        toast.success("Solicitud enviada", {
-          description: emailSent
-            ? "Te escribiremos por WhatsApp para confirmar tu pedido."
-            : "Te escribiremos por WhatsApp. No pudimos enviarte el correo de confirmación.",
-        });
+      .then((receipt) => {
+        saveReceipt(receipt);
+        toast.success("Solicitud registrada. Continúa por WhatsApp.");
         form.reset();
         resetCart();
         push("/checkout/confirmation");
@@ -245,7 +255,7 @@ export function CheckoutForm() {
                 </div>
               </FormControl>
               <FormDescription>
-                Te escribiremos aquí para confirmar tu pedido.
+                Usa el número desde el que nos escribirás por WhatsApp.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -343,14 +353,57 @@ export function CheckoutForm() {
           )}
         />
 
-        {deliveryType === "AGENCY" ? <div className="space-y-3">
-          {!unknownAgency ? <ShippingAgencySelect value={agency} onChange={value => {setAgency(value); form.setValue("agencyId", value?.id ?? "", {shouldValidate: true}); form.setValue("district", value?.ubigeo ?? "");}} /> : null}
-          <label className="flex gap-2 items-center text-sm"><input type="checkbox" checked={unknownAgency} onChange={e => {form.setValue("unknownAgency", e.target.checked); form.setValue("district", !e.target.checked && agency ? agency.ubigeo : "");}} />No encuentro mi agencia</label>
-          {unknownAgency ? <label className="block text-sm">Ciudad, sede y dirección o referencia<Input {...form.register("agencyNote")} maxLength={300} placeholder="La tienda revisará esta sede contigo" /></label> : null}
-          {form.formState.errors.agencyId ? <p role="alert" className="text-sm text-destructive">{form.formState.errors.agencyId.message}</p> : null}
-          <p className="text-sm text-muted-foreground">Después te enviaremos un enlace para confirmar quién recoge el paquete y su DNI.</p>
-        </div> : null}
-        {deliveryType === "MOTORBIKE" || (deliveryType === "AGENCY" && unknownAgency) ? (
+        {deliveryType === "AGENCY" ? (
+          <div className="space-y-3">
+            {!unknownAgency ? (
+              <ShippingAgencySelect
+                value={agency}
+                onChange={(value) => {
+                  setAgency(value);
+                  form.setValue("agencyId", value?.id ?? "", {
+                    shouldValidate: true,
+                  });
+                  form.setValue("district", value?.ubigeo ?? "");
+                }}
+              />
+            ) : null}
+            <label className="flex gap-2 items-center text-sm">
+              <input
+                type="checkbox"
+                checked={unknownAgency}
+                onChange={(e) => {
+                  form.setValue("unknownAgency", e.target.checked);
+                  form.setValue(
+                    "district",
+                    !e.target.checked && agency ? agency.ubigeo : "",
+                  );
+                }}
+              />
+              No encuentro mi agencia
+            </label>
+            {unknownAgency ? (
+              <label className="block text-sm">
+                Ciudad, sede y dirección o referencia
+                <Input
+                  {...form.register("agencyNote")}
+                  maxLength={300}
+                  placeholder="La tienda revisará esta sede contigo"
+                />
+              </label>
+            ) : null}
+            {form.formState.errors.agencyId ? (
+              <p role="alert" className="text-sm text-destructive">
+                {form.formState.errors.agencyId.message}
+              </p>
+            ) : null}
+            <p className="text-sm text-muted-foreground">
+              Después te enviaremos un enlace para confirmar quién recoge el
+              paquete y su DNI.
+            </p>
+          </div>
+        ) : null}
+        {deliveryType === "MOTORBIKE" ||
+        (deliveryType === "AGENCY" && unknownAgency) ? (
           <>
             <Separator />
             <h2 className="text-xl font-semibold">
@@ -407,6 +460,12 @@ export function CheckoutForm() {
           </>
         ) : null}
 
+        <p className="text-sm text-muted-foreground">
+          Registraremos tu solicitud y podrás enviarnos su resumen por WhatsApp
+          para concretar tu compra. El mensaje lo envías tú; todavía no se
+          realiza ningún pago.
+        </p>
+
         <Turnstile onToken={setCaptchaToken} />
 
         <Button
@@ -421,7 +480,7 @@ export function CheckoutForm() {
         >
           {form.formState.isSubmitting || loading
             ? "Enviando..."
-            : "Enviar solicitud"}
+            : "Continuar por WhatsApp"}
         </Button>
       </form>
     </Form>

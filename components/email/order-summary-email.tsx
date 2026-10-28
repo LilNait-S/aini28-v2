@@ -58,12 +58,14 @@ export default function OrderSummaryEmail({
         >
           <Heading style={{ color: "#333" }}>Solicitud recibida</Heading>
           <Text>
-            Hola {fullName}, gracias por tu solicitud. Te escribiremos por
-            WhatsApp para confirmar tu pedido y los datos de pago.
+            Hola {fullName}, gracias por tu solicitud. Continúa desde la página
+            de confirmación y envíanos el resumen por WhatsApp para coordinar tu
+            compra, el pago y la entrega. Si ya lo enviaste, seguimos por ese
+            chat.
           </Text>
           <Text>
-            Esta solicitud no confirma una venta ni reserva productos. El
-            envío se coordina aparte.
+            Esta solicitud no confirma una venta ni reserva productos. El envío
+            se coordina aparte.
           </Text>
           <Heading as="h3" style={{ fontSize: "18px" }}>
             📦 Productos
