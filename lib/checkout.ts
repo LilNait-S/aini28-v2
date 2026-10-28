@@ -10,7 +10,7 @@ export const paymentMethodLabels = {
 export const deliveryTypeLabels = {
   PICKUP: "Recojo en tienda",
   MOTORBIKE: "Motorizado (Lima y Callao)",
-  AGENCY: "Agencia (Shalom u Olva)",
+  AGENCY: "Agencia Shalom",
 } as const;
 
 /** "Motorizado (Lima y Callao) · Miraflores, Lima, Lima". */

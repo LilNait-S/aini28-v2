@@ -77,6 +77,7 @@ export async function POST(req: NextRequest) {
 
   if (plush.status === 409) {
     const code = plush.body?.code;
+    if (code === "SHIPPING_AGENCY_UNAVAILABLE" || code === "SHIPPING_AGENCY_LOCATION_MISMATCH") return NextResponse.json({message: "La agencia seleccionada cambió o no está disponible. Vuelve a elegir la sede."}, {status: 409});
     if (code === "SALE_REQUEST_ITEMS_UNAVAILABLE")
       return NextResponse.json(
         {

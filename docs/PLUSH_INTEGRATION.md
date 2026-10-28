@@ -247,3 +247,7 @@ Verified in production 2026-10-23: 32/32 variants AVAILABLE, product detail
 "Disponible", footer, JSON-LD and "Preguntar por WhatsApp" use the store
 data from Plush. Pending: one real checkout (needs a human Turnstile pass)
 seen in the Plush inbox; decide whether to repair or remove Upstash.
+
+
+## Shalom shipping (2026-10-28, local)
+Checkout AGENCY now selects exact agencyId/ubigeo from Plush through GET /api/shipping-agencies, or sends agencyNote with a district for staff review. No DNI at checkout. The public proxy validates directory responses, debounces browser searches and throttles40/min per client before upstream. Plush must release migration0029 and import its sourced directory before this checkout is published. Recipient/DNI confirmation is collected later through an expiring Plush link. Local typecheck/lint/build and14 catalog tests passed; browser search/selection verified. No publication or confirmation email sent during QA.

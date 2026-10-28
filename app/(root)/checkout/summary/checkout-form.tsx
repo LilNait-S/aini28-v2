@@ -1,5 +1,7 @@
 "use client";
 
+import { ShippingAgencySelect } from "@/components/shipping-agency-select";
+import type { ShippingAgency } from "@/types/shipping";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -52,6 +54,9 @@ const formSchema = z
     province: z.string(),
     district: z.string(),
     address: z.string(),
+    agencyId: z.string(),
+    agencyNote: z.string(),
+    unknownAgency: z.boolean(),
   })
   .superRefine((value, context) => {
     const result = customerContactSchema.safeParse(toContact(value));
@@ -60,7 +65,9 @@ const formSchema = z
       const [first, second] = issue.path;
       const path =
         first === "delivery"
-          ? second === "ubigeo"
+          ? second === "agencyId" || second === "agencyNote"
+            ? "agencyId"
+            : second === "ubigeo"
             ? "district"
             : second === "address"
               ? "address"
@@ -80,7 +87,7 @@ function toContact(value: FormValues): CustomerContact {
           address: value.address.trim(),
         }
       : value.deliveryType === "AGENCY"
-        ? { type: "AGENCY" as const, ubigeo: value.district }
+        ? { type: "AGENCY" as const, ubigeo: value.district, ...(value.unknownAgency ? {agencyNote: value.agencyNote} : value.agencyId ? {agencyId: value.agencyId} : {}) }
         : { type: "PICKUP" as const };
   return {
     fullName: value.fullName.trim(),
@@ -95,6 +102,7 @@ function toContact(value: FormValues): CustomerContact {
 
 export function CheckoutForm() {
   const { cartItems, resetCart } = useCartState();
+  const [agency, setAgency] = useState<ShippingAgency | null>(null);
   const [captchaToken, setCaptchaToken] = useState("");
   const { createOrder, loading } = useOrder();
   const requestId = useRef(crypto.randomUUID());
@@ -111,9 +119,13 @@ export function CheckoutForm() {
       province: "",
       district: "",
       address: "",
+      agencyId: "",
+      agencyNote: "",
+      unknownAgency: false,
     },
   });
   const deliveryType = form.watch("deliveryType");
+  const unknownAgency = form.watch("unknownAgency");
   const department = form.watch("department");
   const province = form.watch("province");
   const provinces =
@@ -299,6 +311,8 @@ export function CheckoutForm() {
               <Select
                 onValueChange={(value) => {
                   field.onChange(value);
+                  setAgency(null);
+                  form.setValue("agencyId", "");
                   for (const child of [
                     "department",
                     "province",
@@ -329,7 +343,14 @@ export function CheckoutForm() {
           )}
         />
 
-        {deliveryType === "MOTORBIKE" || deliveryType === "AGENCY" ? (
+        {deliveryType === "AGENCY" ? <div className="space-y-3">
+          {!unknownAgency ? <ShippingAgencySelect value={agency} onChange={value => {setAgency(value); form.setValue("agencyId", value?.id ?? "", {shouldValidate: true}); form.setValue("district", value?.ubigeo ?? "");}} /> : null}
+          <label className="flex gap-2 items-center text-sm"><input type="checkbox" checked={unknownAgency} onChange={e => {form.setValue("unknownAgency", e.target.checked); form.setValue("district", !e.target.checked && agency ? agency.ubigeo : "");}} />No encuentro mi agencia</label>
+          {unknownAgency ? <label className="block text-sm">Ciudad, sede y dirección o referencia<Input {...form.register("agencyNote")} maxLength={300} placeholder="La tienda revisará esta sede contigo" /></label> : null}
+          {form.formState.errors.agencyId ? <p role="alert" className="text-sm text-destructive">{form.formState.errors.agencyId.message}</p> : null}
+          <p className="text-sm text-muted-foreground">Después te enviaremos un enlace para confirmar quién recoge el paquete y su DNI.</p>
+        </div> : null}
+        {deliveryType === "MOTORBIKE" || (deliveryType === "AGENCY" && unknownAgency) ? (
           <>
             <Separator />
             <h2 className="text-xl font-semibold">
@@ -380,7 +401,7 @@ export function CheckoutForm() {
               />
             ) : (
               <p className="text-sm text-muted-foreground">
-                Te pediremos por WhatsApp el DNI y la sede de la agencia.
+                Confirmaremos la agencia contigo antes del envío.
               </p>
             )}
           </>

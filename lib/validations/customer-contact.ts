@@ -26,7 +26,7 @@ export const deliverySchema = z.discriminatedUnion("type", [
       .min(5, "Escribe tu dirección (calle, número, referencia)")
       .max(240),
   }),
-  z.object({ type: z.literal("AGENCY"), ubigeo: district }),
+  z.object({ type: z.literal("AGENCY"), ubigeo: district, agencyId: z.string().uuid().optional(), agencyNote: z.string().trim().min(5).max(300).optional() }),
 ]);
 
 /** Checkout contact data, aligned with a Plush Solicitud. */
@@ -54,6 +54,10 @@ export const customerContactSchema = z.object({
     message: "Elige cómo pagarás",
   }),
   delivery: deliverySchema,
+}).superRefine((value, ctx) => {
+  if (value.delivery.type !== "AGENCY") return;
+  if (!value.delivery.agencyId && !value.delivery.agencyNote) ctx.addIssue({code: "custom", path: ["delivery", "agencyId"], message: "Elige tu agencia o indica la sede para revisión"});
+  if (value.delivery.agencyId && value.delivery.agencyNote) ctx.addIssue({code: "custom", path: ["delivery", "agencyId"], message: "Elige una agencia o solicita revisión"});
 });
 
 export type CustomerContact = z.infer<typeof customerContactSchema>;
